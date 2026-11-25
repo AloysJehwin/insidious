@@ -1,0 +1,103 @@
+# agent: Claude-powered SRE planner + guarded executor (port 8004). guardian POSTs incidents here; the agent
+# collects telemetry, asks Claude (or the rule-based planner when AGENT_MOCK=1) for a plan, sends it to ops-bot
+# for the founder's approval, then executes the chosen option within the guardrails in insidious.yaml.
+# Kubernetes access via service account `agent` (see agent-rbac.yaml). Secrets come from insidious-env.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: agent
+  namespace: insidious
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: agent
+  namespace: insidious
+  labels:
+    app: agent
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: agent
+  template:
+    metadata:
+      labels:
+        app: agent
+    spec:
+      serviceAccountName: agent
+      containers:
+        - name: agent
+          image: insidious/agent:dev
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8004
+          envFrom:
+            - secretRef:
+                name: insidious-env
+                optional: true
+          # `env` wins over `envFrom`, so these in-cluster URLs override the compose-style ones in .env.
+          env:
+            - name: INSIDIOUS_CONFIG
+              value: /config/insidious.yaml
+            - name: INSIDIOUS_FLAGS
+              value: /config/flags.yaml
+            - name: DATA_DIR
+              value: /data
+            - name: STORE_URL
+              value: http://store-api.store.svc.cluster.local:8000
+            - name: PAYMENTS_URL
+              value: http://payments-mock.store.svc.cluster.local:8001
+            - name: GUARDIAN_URL
+              value: http://guardian.insidious.svc.cluster.local:8002
+            - name: OPS_BOT_URL
+              value: http://ops-bot.insidious.svc.cluster.local:8003
+            - name: AGENT_URL
+              value: http://agent.insidious.svc.cluster.local:8004
+            - name: PROMETHEUS_URL
+              value: http://prometheus.insidious.svc.cluster.local:9090
+            - name: AWS_REGION
+              value: ap-south-1
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 12
+          volumeMounts:
+            - name: config
+              mountPath: /config
+              readOnly: true
+            - name: data
+              mountPath: /data
+      volumes:
+        - name: config
+          configMap:
+            name: insidious-config
+        # Plans live here as JSON; they survive container restarts but not pod rescheduling (fine for a demo).
+        - name: data
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: agent
+  namespace: insidious
+  labels:
+    app: agent
+spec:
+  selector:
+    app: agent
+  ports:
+    - name: http
+      port: 8004
+      targetPort: http

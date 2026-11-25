@@ -1,0 +1,27 @@
+# OPTIONAL: only for clusters running prometheus-operator (e.g. kube-prometheus-stack, possibly the
+# Prometheus the NudgeBee agent installs). Not part of deploy/k8s/kustomization.yaml, because the
+# ServiceMonitor CRD may not exist. Apply separately:
+#   kubectl --context kind-insidious apply -f deploy/k8s/optional/servicemonitor.yaml
+# The `release` label must match your operator's serviceMonitorSelector (check:
+#   kubectl --context kind-insidious get prometheus -A -o jsonpath='{..serviceMonitorSelector}').
+# jobLabel: app makes the series carry job="store-api", same as Insidious's own Prometheus.
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: store-api
+  namespace: store
+  labels:
+    app: store-api
+    release: kube-prometheus-stack
+spec:
+  jobLabel: app
+  selector:
+    matchLabels:
+      app: store-api
+  namespaceSelector:
+    matchNames: [store]
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 5s
+      scrapeTimeout: 4s

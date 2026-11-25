@@ -1,0 +1,17 @@
+{
+  "id": "slo-checkout-p95-1732545600",
+  "fingerprint": "jeffy/store-api/checkout-p95",
+  "status": "firing",
+  "title": "Checkout p95 1840ms breaches 800ms SLO at 420 rps",
+  "rule_name": "insidious-slo",
+  "severity": "high",
+  "subject": {"name": "store-api", "type": "Deployment", "namespace": "store"},
+  "labels": {
+    "route": "/checkout",
+    "p95_ms": "1840",
+    "rps": "420",
+    "heavy_features": "on",
+    "capacity_gain_if_shed": "+62%"
+  },
+  "description": "From insidious guardian. Readiness report: shedding heavy_features raised breaking point 420 -> 680 rps."
+}

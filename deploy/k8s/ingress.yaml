@@ -1,0 +1,73 @@
+# ingress-nginx (kind provider) at http://localhost:80; ngrok forwards the public static domain here.
+# An Ingress can only point at Services in its own namespace, so there are two Ingresses with no host;
+# ingress-nginx merges them and longest-prefix wins:
+#   /whatsapp, /nb, /flagsmith, /api/brief, /api/pending -> ops-bot (ns insidious)
+#   everything else (/, /ops, /api/products, ...)         -> store-api (ns store)
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ops-bot
+  namespace: insidious
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-body-size: 10m
+spec:
+  ingressClassName: nginx
+  rules:
+    - http:
+        paths:
+          - path: /whatsapp
+            pathType: Prefix
+            backend:
+              service:
+                name: ops-bot
+                port:
+                  number: 8003
+          - path: /nb
+            pathType: Prefix
+            backend:
+              service:
+                name: ops-bot
+                port:
+                  number: 8003
+          - path: /flagsmith
+            pathType: Prefix
+            backend:
+              service:
+                name: ops-bot
+                port:
+                  number: 8003
+          - path: /api/brief
+            pathType: Prefix
+            backend:
+              service:
+                name: ops-bot
+                port:
+                  number: 8003
+          - path: /api/pending
+            pathType: Prefix
+            backend:
+              service:
+                name: ops-bot
+                port:
+                  number: 8003
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: store-api
+  namespace: store
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+spec:
+  ingressClassName: nginx
+  rules:
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: store-api
+                port:
+                  number: 8000

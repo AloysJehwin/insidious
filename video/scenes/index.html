@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Insidious demo scenes</title>
+<link rel="stylesheet" href="fonts/fonts.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="stage">
+  <svg width="0" height="0" style="position:absolute"><defs><linearGradient id="fl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFD58A"/><stop offset="1" stop-color="#FF8A1F"/></linearGradient></defs></svg>
+  <div id="bg"><div class="glow g1"></div><div class="glow g2"></div><div id="bokeh"></div></div>
+
+  <!-- 1. HOOK -->
+  <section class="scene" id="hook">
+    <div id="titlecard" data-t="0" data-a="fade" data-d="0.5" data-out="@c1|+0.25">
+      <div class="logo" data-t="0.1" data-a="pop" data-d="0.8"><svg viewBox="0 0 24 24"><path d="M12 1.5C15.5 6.5 19.5 9.6 19.5 14.6A7.5 7.5 0 0 1 4.5 14.6C4.5 11.2 6.6 9.1 8.4 6.9C8.8 9.2 9.8 10.4 11 10.9C10.6 7.9 11.2 4.6 12 1.5Z" fill="url(#fl)"/></svg>Insidious</div>
+      <div class="t2" data-t="0.45" data-a="up">An on-call SRE that lives in the founder's WhatsApp</div>
+    </div>
+    <div class="abs" style="left:120px;top:190px;width:900px">
+      <div class="kicker" data-t="@c1|+0.35" data-a="up">Diwali sale night</div>
+      <div class="clock" data-t="@c1|+0.55" data-a="pop" data-d="0.5">8:00<span>PM</span></div>
+      <div class="ravi card" data-t="@c1~Ravi|-0.2" data-a="up" data-d="0.7">
+        <div class="avatar">R</div>
+        <div><div class="rn">Ravi <span class="muted">· founder, Jeffi Stores</span></div>
+        <div class="rs">Handmade juttis · runs his own website</div></div>
+      </div>
+      <div class="hook-line" data-t="@c1~can't read|-0.3" data-a="up">…and he can't read a server dashboard.</div>
+    </div>
+    <div class="abs browser" style="left:1080px;top:200px;width:700px;height:520px" data-t="@c1~Ravi|+0.4" data-a="right" data-d="0.8">
+      <div class="bar"><i></i><i></i><i></i><span>jeffistores.in / checkout</span></div>
+      <div class="shop">
+        <div class="prod"><div class="ph"></div><div><b>Handmade jutti · festive gold</b><div class="muted">Size 7 · Qty 1</div><div class="price">₹1,800</div></div></div>
+        <div class="paybtn" data-on="@c1~Last year">Place order</div>
+        <div class="frozen" data-t="@c1~Last year" data-a="fade" data-d="0.3">
+          <div class="spinner"></div>
+          <div>Processing… <span class="mono" data-t="@c1~Last year" data-a="count" data-from="0" data-to="9" data-d="5" data-fmt="secs">0 s</span></div>
+          <div class="frozen-tag">Last year, 8:04 PM: checkout frozen</div>
+        </div>
+      </div>
+    </div>
+    <div class="abs dashfog" style="left:1180px;top:640px;width:560px;height:220px" data-t="@c1~server dashboard|-0.6" data-a="up">
+      <svg viewBox="0 0 560 220" width="560" height="220"><g stroke="#5b6376" fill="none" stroke-width="2"><path d="M10 170 L60 150 L110 160 L160 90 L210 120 L260 60 L310 140 L360 100 L410 130 L460 40 L550 80"/><path d="M10 200 L80 190 L150 196 L220 170 L290 185 L360 150 L430 175 L550 120" stroke="#3b4252"/></g><g fill="#2a2f3b"><rect x="10" y="10" width="120" height="30" rx="4"/><rect x="150" y="10" width="90" height="30" rx="4"/><rect x="260" y="10" width="150" height="30" rx="4"/></g></svg>
+      <div class="qm">p99? iowait? pool_overflow?</div>
+    </div>
+  </section>
+
+  <!-- 2. MONEY -->
+  <section class="scene" id="money">
+    <div class="abs" style="left:120px;top:150px;width:1680px">
+      <div class="kicker" data-t="0.2" data-a="up">The money problem</div>
+      <div class="h2" data-t="0.35" data-a="up">What a slow checkout costs Ravi</div>
+      <div class="pill-est" data-t="@c2~estimates|-0.2" data-a="pop">ESTIMATE · illustrative maths</div>
+    </div>
+    <div class="abs row3" style="left:120px;top:340px;width:1680px">
+      <div class="card stat" data-t="@c2~eighteen|-0.3" data-a="up"><div class="lbl">Average order</div><div class="big"><span data-t="@c2~eighteen|-0.3" data-a="count" data-from="0" data-to="1800" data-d="1" data-fmt="inr">₹0</span></div></div>
+      <div class="card stat" data-t="@c2~six hundred|-0.3" data-a="up"><div class="lbl">Orders on sale night</div><div class="big"><span data-t="@c2~six hundred|-0.3" data-a="count" data-from="0" data-to="600" data-d="1" data-fmt="int">0</span><small> / hour</small></div></div>
+      <div class="card stat" data-t="@c2~rule of thumb|-0.2" data-a="up"><div class="lbl">Industry rule of thumb</div><div class="big">−<span data-t="@c2~seven|-0.3" data-a="count" data-from="0" data-to="7" data-d="0.8" data-fmt="int">0</span>%<small> orders / extra second</small></div></div>
+    </div>
+    <div class="abs card speed" style="left:120px;top:580px;width:1680px;height:130px" data-t="@c2~Checkout went|-0.3" data-a="up">
+      <div class="lbl">Checkout time on sale night</div>
+      <div class="track">
+        <div class="okzone"><span>normal: under 1 s</span></div>
+        <div class="slowbar" data-t="@c2~almost five|-0.6" data-a="grow-x" data-d="1.4"></div>
+        <div class="ticks"><span style="left:0%">0 s</span><span style="left:16.66%">1 s</span><span style="left:33.33%">2 s</span><span style="left:50%">3 s</span><span style="left:66.66%">4 s</span><span style="left:83.33%">5 s</span></div>
+        <div class="slowlbl" data-t="@c2~almost five|+0.6" data-a="fade">4.8 s <small>measured on our cluster</small></div>
+      </div>
+    </div>
+    <div class="abs result" style="left:120px;top:752px;width:1680px">
+      <div class="res" data-t="@c2~twenty-eight|-0.3" data-a="up"><div class="lbl">Fewer orders</div><div class="mid">≈ <span data-t="@c2~twenty-eight|-0.3" data-a="count" data-from="0" data-to="28" data-d="0.9" data-fmt="int">0</span>%</div></div>
+      <div class="arrow" data-t="@c2~hundred and sixty|-0.4" data-a="fade">→</div>
+      <div class="res" data-t="@c2~hundred and sixty|-0.3" data-a="up"><div class="lbl">Orders lost</div><div class="mid"><span data-t="@c2~hundred and sixty|-0.3" data-a="count" data-from="0" data-to="168" data-d="0.9" data-fmt="int">0</span><small> / hour</small></div></div>
+      <div class="arrow" data-t="@c2~three lakh|-0.5" data-a="fade">→</div>
+      <div class="res gold" data-t="@c2~three lakh|-0.4" data-a="pop"><div class="lbl">Sales lost (estimate)</div><div class="huge"><span data-t="@c2~three lakh|-0.4" data-a="count" data-from="0" data-to="302400" data-d="1.6" data-fmt="inr">₹0</span><small> / hour</small></div></div>
+    </div>
+    <div class="abs foot" style="left:120px;top:905px;width:1680px" data-t="@c2~three lakh|+0.8" data-a="fade">Estimate: (5 s − 1 s) × 7% ≈ 28% · 600 × 28% = 168 orders · 168 × ₹1,800 = ₹3,02,400 per hour. Checkout p95 4.8 s measured under surge on our k3s cluster.</div>
+  </section>
+
+  <!-- 3. MEET -->
+  <section class="scene" id="meet">
+    <div class="abs meet-hero" style="left:120px;top:190px;width:800px" data-t="@c3a|-0.2" data-a="up" data-out="@c3b|+0.35">
+      <div class="logo"><svg viewBox="0 0 24 24"><path d="M12 1.5C15.5 6.5 19.5 9.6 19.5 14.6A7.5 7.5 0 0 1 4.5 14.6C4.5 11.2 6.6 9.1 8.4 6.9C8.8 9.2 9.8 10.4 11 10.9C10.6 7.9 11.2 4.6 12 1.5Z" fill="url(#fl)"/></svg>Insidious</div>
+      <div class="tag">An on-call SRE that lives in the founder's WhatsApp.</div>
+    </div>
+    <div class="abs term card" style="left:960px;top:190px;width:840px" data-t="@c3a~One SDK|-0.3" data-a="right" data-out="@c3b|+0.35">
+      <div class="tl"><i></i><i></i><i></i><span>terminal</span></div>
+      <div class="ln" data-t="@c3a~One SDK|-0.1" data-a="type" data-d="0.6"><b>$</b> pip install insidious<em>   # the SDK</em></div>
+      <div class="ln" data-t="@c3a~three commands|-0.2" data-a="type" data-d="0.5"><b>$</b> insidious init<em>       # flags, k8s, NudgeBee</em></div>
+      <div class="ln" data-t="@c3a~three commands|+0.3" data-a="type" data-d="0.5"><b>$</b> insidious rehearse<em>   # flag-aware load test</em></div>
+      <div class="ln" data-t="@c3a~three commands|+0.8" data-a="type" data-d="0.5"><b>$</b> insidious guard<em>      # sale-night mode</em></div>
+    </div>
+    <div class="abs arch" style="left:0;top:0;width:1920px;height:1080px">
+      <svg class="edges" viewBox="0 0 1920 1080" width="1920" height="1080">
+        <defs><marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10z" fill="#8b93a7"/></marker></defs>
+        <path id="e-store-guard" d="M450 526 L540 526" data-t="@c3b|+0.8" data-a="draw" pathLength="1" marker-end="url(#ah)"/>
+        <path id="e-guard-nb" d="M860 526 L950 526" data-t="@c3b~something breaks|-0.2" data-a="draw" pathLength="1" marker-end="url(#ah)"/>
+        <path id="e-guard-claude" d="M700 470 C700 400 1450 420 1450 312" data-t="@c3b~Claude|-0.1" data-a="draw" data-d="0.9" pathLength="1" marker-end="url(#ah)"/>
+        <path id="e-nb-claude" d="M1270 526 C1420 526 1520 450 1520 312" data-t="@c3b~Claude|+0.2" data-a="draw" data-d="0.8" pathLength="1" marker-end="url(#ah)"/>
+        <path id="e-claude-ops" d="M1400 256 L1270 256" data-t="@c3b~approves|-0.3" data-a="draw" pathLength="1" marker-end="url(#ah)" marker-start="url(#ah)"/>
+        <path id="e-ops-sarvam" d="M950 256 L860 256" data-t="@c3b~WhatsApp|-0.3" data-a="draw" pathLength="1" marker-end="url(#ah)" marker-start="url(#ah)"/>
+        <path id="e-sarvam-wa" d="M540 256 L450 256" data-t="@c3b~own language|-0.4" data-a="draw" pathLength="1" marker-end="url(#ah)" marker-start="url(#ah)"/>
+        <path id="e-claude-act" d="M1580 312 L1580 740 M1580 680 L1110 680 L1110 740 M1110 680 L700 680 L700 740" data-t="@c3b~Nothing changes|-0.1" data-a="draw" data-d="1.0" pathLength="1"/>
+        <path id="e-flags-store" d="M540 796 L290 796 L290 586" data-t="@c3b~Nothing changes|+0.8" data-a="draw" data-d="0.7" pathLength="1" marker-end="url(#ah)" class="dashed"/>
+        <text x="495" y="512" data-t="@c3b~checkout|+0.4" data-a="fade" text-anchor="middle">metrics</text>
+        <text x="905" y="512" data-t="@c3b~something breaks|+0.1" data-a="fade" text-anchor="middle">webhook</text>
+        <text x="1440" y="560" data-t="@c3b~Claude|+0.6" data-a="fade">AI root cause</text>
+        <text x="1000" y="420" data-t="@c3b~Claude|+0.4" data-a="fade">incident</text>
+        <text x="1335" y="242" data-t="@c3b~approves|+0.1" data-a="fade" text-anchor="middle">plan / yes</text>
+        <text x="320" y="840" data-t="@c3b~Nothing changes|+1.2" data-a="fade">flags, local eval</text>
+        <text x="1595" y="660" data-t="@c3b~Nothing changes|+0.6" data-a="fade">only after Ravi's yes</text>
+      </svg>
+      <div class="node" style="left:130px;top:200px" data-t="@c3b~own language|-0.5" data-a="pop"><b>Ravi · WhatsApp</b><span>voice notes + reply buttons</span></div>
+      <div class="node sp" style="left:540px;top:200px" data-t="@c3b~own language|-0.7" data-a="pop"><b>Sarvam AI</b><span>Saaras · 105b · Mayura · Bulbul</span></div>
+      <div class="node" style="left:950px;top:200px" data-t="@c3b~WhatsApp|-0.5" data-a="pop"><b>ops-bot</b><span>WhatsApp Cloud API bridge</span></div>
+      <div class="node ai" style="left:1400px;top:200px;width:360px" data-t="@c3b~Claude|-0.3" data-a="pop"><b>Claude ops agent</b><span>3 priced options · acts after yes</span></div>
+      <div class="node" style="left:130px;top:470px" data-t="@c3b|-0.05" data-a="pop" data-d="0.4"><b>Jeffi store</b><span>FastAPI + insidious SDK</span></div>
+      <div class="node" style="left:540px;top:470px" data-t="@c3b|+0.15" data-a="pop" data-d="0.4"><b>guardian</b><span>checkout p95 · DB pool · servers</span></div>
+      <div class="node sp" style="left:950px;top:470px" data-t="@c3b~something breaks|-0.4" data-a="pop"><b>NudgeBee</b><span>incident + AI root cause</span></div>
+      <div class="node sp" style="left:540px;top:740px" data-t="@c3b~Nothing changes|+0.2" data-a="pop"><b>Flagsmith</b><span>13 flags · runtime control plane</span></div>
+      <div class="node" style="left:950px;top:740px" data-t="@c3b~Nothing changes|+0.35" data-a="pop"><b>Kubernetes</b><span>k3s on AWS EC2 · Mumbai</span></div>
+      <div class="node" style="left:1400px;top:740px;width:360px" data-t="@c3b~Nothing changes|+0.5" data-a="pop"><b>AWS RDS</b><span>Postgres + read replica</span></div>
+    </div>
+  </section>
+
+  <!-- 4. DETECT -->
+  <section class="scene" id="detect">
+    <!-- live console footage is injected here by engine.js from live.json (frames in assets/live-ops) -->
+    <div class="abs livenote" data-t="@c4m~at risk|+0.2" data-a="up" data-out="@c4b|-0.5">Same rule as before: (7.85 s − 0.8 s SLO) × 7% ≈ 49% fewer orders → ≈ 296 orders × ₹1,800 per hour</div>
+    <div class="proof abs" id="proof-triage" style="left:0;top:0;width:1920px;height:1080px" data-t="@c4b|-0.35" data-a="fade" data-d="0.45" data-out="@c4b~Claude|-0.35">
+      <img data-asset="nudgebee-incident-triage.jpg" class="kbimg">
+      <div class="shade"></div>
+      <div class="chip-proof">NudgeBee · incident triaged by NuBi</div>
+    </div>
+    <div class="proof abs" id="proof-evidence" style="left:0;top:0;width:1920px;height:1080px" data-t="@c4b~Claude|-0.35" data-a="fade" data-d="0.45">
+      <img data-asset="nudgebee-evidence.jpg" class="kbimg">
+      <div class="shade"></div>
+      <div class="chip-proof">NudgeBee · evidence the Claude agent reads</div>
+      <div class="plancard" data-t="@c4b~writes a plan|-0.2" data-a="up"><b>Claude ops agent</b> → plan ready: 3 options, each priced in ₹</div>
+    </div>
+  </section>
+
+  <!-- 5. CHAT -->
+  <section class="scene" id="chat">
+    <div class="abs" style="left:120px;top:140px;width:1000px">
+      <div class="kicker" data-t="0.1" data-a="up">Sarvam AI does the talking</div>
+      <div class="h2" data-t="0.25" data-a="up">Ravi talks in his own language</div>
+      <div class="replay" data-t="0.5" data-a="fade">Replayed from live logs</div>
+    </div>
+    <div class="abs langs" style="left:120px;top:395px;width:1020px">
+      <div class="lbl" data-t="@c5a~whatever language|-0.3" data-a="fade">Reply in any language, by voice or text</div>
+      <div class="chips">
+        <span data-t="@c5a~whatever language|-0.1" data-a="pop">தமிழ்</span>
+        <span data-t="@c5a~whatever language|+0.1" data-a="pop">हिंदी</span>
+        <span data-t="@c5a~whatever language|+0.3" data-a="pop" class="hot">Tanglish</span>
+        <span data-t="@c5a~whatever language|+0.5" data-a="pop">తెలుగు</span>
+        <span data-t="@c5a~whatever language|+0.7" data-a="pop">ಕನ್ನಡ</span>
+        <span data-t="@c5a~whatever language|+0.9" data-a="pop">മലയാളം</span>
+        <span data-t="@c5a~whatever language|+1.1" data-a="pop">English</span>
+      </div>
+    </div>
+    <div class="abs pipe" style="left:120px;top:540px;width:1020px">
+      <div class="prow" data-t="@c5a|+0.2" data-a="left" data-on="@c5a|+0.2"><i>1</i><b>Saaras v4</b><span>hears the voice note, detects the language</span></div>
+      <div class="prow" data-t="@c5a~Sarvam understands|-0.2" data-a="left" data-on="@c5a~Sarvam understands|-0.2"><i>2</i><b>sarvam-105b</b><span>understands what he's asking</span></div>
+      <div class="prow" data-t="@c5a2~Claude|-0.2" data-a="left" data-on="@c5a2~Claude|-0.2"><i>3</i><b>Mayura</b><span>turns Claude's plan into Tanglish</span></div>
+      <div class="prow" data-t="@c5a2~voice note|-0.2" data-a="left" data-on="@c5a2~voice note|-0.2"><i>4</i><b>Bulbul v4</b><span>sends it as a WhatsApp voice note</span></div>
+    </div>
+    <div class="abs phone" style="left:1250px;top:120px">
+      <div class="ph-head"><div class="ph-av">IN</div><div><b>Insidious Ops</b><span>WhatsApp Business API · test number</span></div></div>
+      <div class="ph-body"><div class="ph-scroll" id="chat-scroll">
+        <div class="msg out" data-show="@c5a|+0.3">
+          <div class="who">Ravi · Tamil voice note</div>
+          <div class="vn"><span class="play">▶</span><span class="wv"></span><span class="dur">0:03</span></div>
+          <div class="ta">கடை எப்படி போயிட்டு இருக்கு?</div>
+          <div class="tr">“How's the shop doing?”</div>
+          <div class="det">Saaras v4 · detected ta-IN · confidence 1.0</div>
+          <div class="meta">15:06 <em class="ticks">✓✓</em></div>
+        </div>
+        <div class="msg in" data-show="@c5a~replies in kind|-0.2">
+          <div class="vn big" id="vn-plan"><span class="play">▶</span><span class="wv"></span><span class="dur">0:13</span></div>
+          <div class="micro">Sarvam Bulbul · Tanglish voice note</div>
+          <div class="spoken">“Visitors oru second-ku 30 thadava jump panrathala checkout romba slow aayiduchu. En suggestion: Pause extras, servers add panni, DB-a widen pannunga. Naan proceed pannattuma?”</div>
+          <div class="meta">15:06 <em class="ticks">✓✓</em></div>
+        </div>
+        <div class="msg in dense" data-show="@c5a2~three buttons|-0.4">
+          <div>Visitors oru second-ku 30 thadava jump panrathala checkout romba slow aayiduchu. Server max out aagiduchu, database-um busy-aa iruku. Product suggestions-um extras-um pause panni, rendu servers add panni, database-ku innum space koduththaa better-aa irukkum. Extra cost oru hour-ku Rs. 8 irukkum.</div>
+          <div class="opts"><div data-on="@c5b~Pause extras|-0.2">1. Pause extras, servers add panni, DB-a widen pannunga (naan recommend panradhu)</div><div data-on="@c5b~only pause|-0.2">2. Pause extras-a disable pannittu, DB-a mattum widen pannunga</div><div data-on="@c5b~do nothing|-0.2">3. Ippodhaikku onnum panna vendaam</div></div>
+          <div>Naan proceed pannattuma?</div>
+          <div class="gloss">“Checkout has become very slow as visitors jump to about 30 a second… I recommend pausing product suggestions and extras, adding two servers and giving the database more room. Extra cost is about ₹8 per hour.”</div>
+          <div class="btns">
+            <div class="btn" id="btn1" data-on="@c5b~Pause extras|-0.2" data-on2="@c5b~taps|+0.2">1 ⭐ Pause extras…<span class="ripple"></span></div>
+            <div class="btn" data-on="@c5b~only pause|-0.2">2 Pause extras-a…</div>
+            <div class="btn" data-on="@c5b~do nothing|-0.2">3 ✖ Ippodhaikku…</div>
+          </div>
+          <div class="meta">15:06 <em class="ticks">✓✓</em></div>
+        </div>
+        <div class="msg out" data-show="@c5b~taps|+0.75"><div>1 ⭐ Pause extras…</div><div class="meta">15:07 <em class="ticks">✓✓</em></div></div>
+      </div></div>
+    </div>
+    <div class="abs vnote" style="left:1200px;top:906px;width:540px" data-t="@c5a~replies in kind|+0.4" data-a="fade">Tanglish voice note (Sarvam Bulbul) · not played here</div>
+    <div class="abs finger" id="finger" data-t="@c5b~taps|-0.5" data-a="fade" data-d="0.3" data-out="@c5b~taps|+0.9"></div>
+  </section>
+
+  <!-- 6. FIX -->
+  <section class="scene" id="fix">
+    <div class="abs" style="left:120px;top:150px;width:760px">
+      <div class="kicker" data-t="0.1" data-a="up">One tap later</div>
+      <div class="h2" data-t="0.25" data-a="up">Insidious fixes it</div>
+    </div>
+    <div class="abs replaychip" style="left:120px;top:292px" data-t="0.4" data-a="fade">Replay — actions executed live earlier today (13:23 IST)</div>
+    <div class="abs feed" style="left:120px;top:350px;width:780px">
+      <div class="act" data-t="@c6a~Flagsmith|-0.2" data-a="left"><em class="src sp">Flagsmith</em><div><b>heavy_features <span class="tog on" data-on="@c6a~switches off|+0.2"><i></i></span> OFF</b><span>extras shed: recommendations · hd_images · live_reviews</span></div></div>
+      <div class="act" data-t="@c6a~Kubernetes|-0.2" data-a="left"><em class="src">Kubernetes</em><div><b>store-api: 1 → 2 servers</b><span>scaled within guardrails (≤ 5)</span></div></div>
+      <div class="act" data-t="@c6a~pool doubles|-0.2" data-a="left"><em class="src sp">Flagsmith</em><div><b>db_pool: 5 → 10 (+5 overflow)</b><span>store rebuilds its pool live, ≤ 5 s</span></div></div>
+      <div class="act opt2" data-t="@c6b~widened|-0.3" data-a="left"><em class="src sp">Flagsmith</em><div><b>db_pool: 10 → 20 (+10)</b><span>second approved plan</span></div></div>
+      <div class="act opt2" data-t="@c6b~real AWS|-0.4" data-a="left"><em class="src">AWS RDS</em><div><b>festivekit-replica-1 created</b><span>read replica, scoped IAM role</span></div></div>
+      <div class="act opt2" data-t="@c6b~moved reads|-0.3" data-a="left"><em class="src sp">Flagsmith</em><div><b>read_from_replica ON</b><span>db_read_url → replica, writes stay on primary</span></div></div>
+    </div>
+    <div class="abs card chart" style="left:960px;top:150px;width:820px;height:720px" data-t="0.3" data-a="up">
+      <div class="lbl">Checkout p95</div>
+      <div class="readout"><span id="p95-read" data-t="@c6a~drops|-0.1" data-a="count" data-from="4800" data-to="443" data-d="2.2" data-fmt="int">4,800</span><small> ms</small><em class="zero" data-t="@c6a~NudgeBee measured|-0.2" data-a="pop">NudgeBee-measured 442.8 ms</em></div>
+      <svg viewBox="0 0 760 420" width="760" height="420" class="pchart">
+        <defs><linearGradient id="pg" x1="0" y1="0" x2="0" y2="420" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#FF5D5D"/><stop offset="0.74" stop-color="#FF5D5D"/><stop offset="0.76" stop-color="#3DDC97"/><stop offset="1" stop-color="#3DDC97"/></linearGradient></defs>
+        <g class="grid"><line x1="50" x2="750" y1="20" y2="20"/><line x1="50" x2="750" y1="100" y2="100"/><line x1="50" x2="750" y1="180" y2="180"/><line x1="50" x2="750" y1="260" y2="260"/><line x1="50" x2="750" y1="340" y2="340"/></g>
+        <g class="ylab"><text x="40" y="25">5 s</text><text x="40" y="105">4 s</text><text x="40" y="185">3 s</text><text x="40" y="265">2 s</text><text x="40" y="345">1 s</text><text x="40" y="405">0</text></g>
+        <line class="slo-line" x1="50" x2="750" y1="356" y2="356"/><text class="slo-t" x="748" y="350" text-anchor="end">SLO 800 ms</text>
+        <line id="tapline" x1="430" x2="430" y1="10" y2="400" class="tapline"/>
+        <text id="taptext" x="438" y="40" class="taptext">Ravi taps 1 ⭐</text>
+        <path id="p95-line" pathLength="1" stroke="url(#pg)"/>
+      </svg>
+      <div class="cfoot">Live fix at 13:23 IST: checkout p95 4.8 s → under 0.5 s (NudgeBee RCA: 442.8 ms). Separate load-shed test: 4.8 s → 180 ms at 80 rps, 0 errors.</div>
+    </div>
+    <div class="abs toast" style="left:120px;top:760px;width:780px" data-t="@c6a~drops|+0.6" data-a="up" data-out="@c6b|-0.2"><b>Insidious Ops · replay</b>Mudinjiduchu! Extras pause panniten, servers add panniten, database-ku space koduthen. Checkout ippo fast-aa irukku.<i>“Done! Extras paused, servers added, database given room. Checkout is fast again.”</i></div>
+  </section>
+
+  <!-- 7. RCA PROOF -->
+  <section class="scene" id="rca">
+    <div class="proof abs" style="left:0;top:0;width:1920px;height:1080px;overflow:hidden">
+      <div id="rca-wrap" class="zoomwrap"><img data-asset="nudgebee-rca.jpg" id="rca-img"><div class="hl" id="rca-hl"></div></div>
+      <div class="shade"></div>
+      <div class="chip-proof" data-t="0.2" data-a="fade">NudgeBee · independent AI root-cause analysis</div>
+      <div class="quote" data-t="@c7~confirms|-0.3" data-a="up">
+        <div class="q">“…the [Insidious] Claude ops agent scaled store-api to 2 replicas, shed heavy features in Flagsmith, and expanded the DB connection pool; checkout p95 recovered to 442.8ms.”</div>
+        <div class="qr">Root cause, per NudgeBee: store-api lacked horizontal pod capacity (replicas: 1) to handle 16 RPS with un-shed heavy_features.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8. OUTCOME -->
+  <section class="scene" id="outcome">
+    <div class="abs" style="left:120px;top:150px;width:1680px">
+      <div class="kicker" data-t="0.1" data-a="up">The money outcome</div>
+      <div class="h2" data-t="0.25" data-a="up"><span class="gold">≈ ₹4–8 an hour</span> to protect ≈ ₹5 lakh an hour</div>
+    </div>
+    <div class="abs bars" style="left:120px;top:360px;width:1680px">
+      <div class="brow" data-t="@c8~four to eight|-0.2" data-a="up"><div class="bl">Cost of the fix</div><div class="bt"><div class="bf small" data-t="@c8~four to eight" data-a="grow-x" data-d="0.6"></div></div><div class="bv">≈ ₹4–8 / hour</div></div>
+      <div class="brow" data-t="@c8~protect|-0.2" data-a="up"><div class="bl">Sales at risk</div><div class="bt"><div class="bf big" data-t="@c8~protect" data-a="grow-x" data-d="1.6"></div></div><div class="bv gold">≈ ₹5,32,980 / hour</div></div>
+      <div class="ratio" data-t="@c8~pays for itself|-0.2" data-a="pop">≈ <span data-t="@c8~pays for itself|-0.2" data-a="count" data-from="0" data-to="66000" data-d="1.4" data-fmt="int">0</span>× or more <small>(live console estimate)</small></div>
+    </div>
+    <div class="abs checks" style="left:120px;top:700px;width:1680px">
+      <div class="ck" data-t="@c8~never opened|-0.2" data-a="up">✓ No terminal</div>
+      <div class="ck" data-t="@c8~never opened|+0.3" data-a="up">✓ No dashboard</div>
+      <div class="ck gold" data-t="@c8~terminal|+0.4" data-a="pop">✓ One tap on WhatsApp</div>
+    </div>
+  </section>
+
+  <!-- 9. UNDER THE HOOD -->
+  <section class="scene" id="hood">
+    <div class="sub" id="hood-fs" data-t="@c9a|-0.3" data-a="fade" data-d="0.4" data-out="@c9b|-0.35">
+      <div class="abs kick2" style="left:120px;top:130px"><span class="kicker">Under the hood · Flagsmith</span></div>
+      <div class="abs frame" style="left:120px;top:190px;width:1140px;height:657px"><img data-asset="flagsmith-features.jpg" class="kbimg"><div class="chip-proof in">Flagsmith · every lever is a flag</div></div>
+      <ul class="abs blist" style="left:1340px;top:200px;width:460px">
+        <li data-t="@c9a~Thirteen|-0.2" data-a="left"><b>13 flags</b>, created by <code>insidious init</code></li>
+        <li data-t="@c9a~load-shedding|-0.2" data-a="left"><b>heavy_features</b> parent switch sheds 3 child flags</li>
+        <li data-t="@c9a~load-shedding|+0.4" data-a="left"><b>high_value_cart</b> segment keeps big carts whole</li>
+        <li data-t="@c9a~database pool|-0.2" data-a="left"><b>db_pool</b> live resize · <b>db_read_url</b> replica routing</li>
+        <li data-t="@c9a~kill switch|-0.4" data-a="left"><b>ai_agent</b> kill switch · <b>agent_config</b></li>
+        <li data-t="@c9a~kill switch|+0.2" data-a="left"><b>ops_voice</b> sets Ravi's voice · /ops dashboard toggles</li>
+      </ul>
+    </div>
+    <div class="sub" id="hood-nb" data-t="@c9b|-0.3" data-a="fade" data-d="0.4" data-out="@c9c|-0.35">
+      <div class="abs kick2" style="left:120px;top:130px"><span class="kicker">Under the hood · NudgeBee</span></div>
+      <div class="abs frame" style="left:120px;top:190px;width:1140px;height:657px"><img data-asset="nudgebee-workflow.jpg" class="kbimg"><div class="chip-proof in">NudgeBee · pre-sale-warmup, built with NuBi</div></div>
+      <ul class="abs blist" style="left:1340px;top:200px;width:460px">
+        <li data-t="@c9b|+0.1" data-a="left"><b>Agent on k3s</b>: Prometheus, Loki, ClickHouse</li>
+        <li data-t="@c9b~root causes|-0.4" data-a="left"><b>Incident webhook</b> from guardian</li>
+        <li data-t="@c9b~root causes|-0.1" data-a="left"><b>AI root cause</b> feeds the Claude plan</li>
+        <li data-t="@c9b~NuBi|-0.3" data-a="left"><b>pre-sale-warmup</b> written by NuBi from plain English</li>
+        <li data-t="@c9b~warms|-0.3" data-a="left">7:30 PM → scale to 3 → Flagsmith flags → WhatsApp note</li>
+      </ul>
+    </div>
+    <div class="sub" id="hood-sv" data-t="@c9c|-0.3" data-a="fade" data-d="0.4" data-out="@c9d|-0.35">
+      <div class="abs kick2" style="left:120px;top:150px"><span class="kicker">Under the hood · Sarvam AI</span><div class="h2">The founder's interface</div></div>
+      <div class="abs svrow" style="left:120px;top:380px;width:1680px">
+        <div class="svc" data-t="@c9c~listens|-0.2" data-a="up"><i>Saaras v4</i><b>Listens</b><span>speech-to-text, codemix, auto language</span></div>
+        <div class="svarrow" data-t="@c9c~listens|+0.1" data-a="fade">→</div>
+        <div class="svc" data-t="@c9c~understands|-0.2" data-a="up"><i>sarvam-105b</i><b>Understands</b><span>intent + replies, structured output</span></div>
+        <div class="svarrow" data-t="@c9c~understands|+0.1" data-a="fade">→</div>
+        <div class="svc" data-t="@c9c~speaks|-0.4" data-a="up"><i>Mayura</i><b>Writes Tanglish</b><span>code-mixed, or Tamil script on request</span></div>
+        <div class="svarrow" data-t="@c9c~speaks|-0.1" data-a="fade">→</div>
+        <div class="svc gold" data-t="@c9c~speaks|-0.1" data-a="up"><i>Bulbul v4</i><b>Speaks</b><span>Ravi's voice notes, and this narration</span></div>
+      </div>
+    </div>
+    <div class="sub" id="hood-cl" data-t="@c9d|-0.3" data-a="fade" data-d="0.4">
+      <div class="abs kick2" style="left:120px;top:150px"><span class="kicker">Under the hood · Claude agent + insidious scan</span><div class="h2">Works on a real codebase</div></div>
+      <div class="abs term card" style="left:120px;top:300px;width:980px">
+        <div class="tl"><i></i><i></i><i></i><span>terminal</span></div>
+        <div class="ln" data-t="@c9d|+0.1" data-a="type" data-d="0.7"><b>$</b> insidious scan ./jeffi-stores</div>
+        <div class="ln dim" data-t="@c9d~scan|+0.4" data-a="fade">8 services · 310 routes · 43 env toggles · Postgres + Redis</div>
+        <div class="ln ok" data-t="@c9d~twenty-seven|-0.2" data-a="fade">→ proposed <b class="gold">27 Flagsmith flags</b> (8 under heavy_features)</div>
+        <div class="ln dim" data-t="@c9d~twenty-seven|+0.4" data-a="fade">→ wrote insidious.yaml, flags.yaml, scan-report.md</div>
+        <div class="ln dim" data-t="@c9d~twenty-seven|+0.8" data-a="fade">never opens .env, keys or certificates</div>
+      </div>
+      <div class="abs aws card" id="aws-card" style="left:1180px;top:300px;width:600px" data-t="@c9d~AWS|-0.4" data-a="up">
+        <div class="lbl">Runs on AWS · ap-south-1 (Mumbai)</div>
+        <ul><li>k3s on EC2, behind Cloudflare</li><li>RDS PostgreSQL + read replica</li><li>Claude agent: whitelisted actions, after a yes</li></ul>
+        <div class="live">● live at <b class="cfg-live">festive.aloysjehwin.com</b></div>
+      </div>
+      <div class="abs frame" id="aws-shot" style="left:1180px;top:560px;width:600px;height:300px;display:none" data-t="@c9d~AWS|+0.2" data-a="up"><img id="aws-img" class="kbimg"></div>
+    </div>
+  </section>
+
+  <!-- 10. CLOSE -->
+  <section class="scene" id="close">
+    <div class="abs closebox" id="closebox" style="left:0;top:250px;width:1920px">
+      <div class="logo big" data-t="@c10|-0.3" data-a="pop" data-d="0.8"><svg viewBox="0 0 24 24"><path d="M12 1.5C15.5 6.5 19.5 9.6 19.5 14.6A7.5 7.5 0 0 1 4.5 14.6C4.5 11.2 6.6 9.1 8.4 6.9C8.8 9.2 9.8 10.4 11 10.9C10.6 7.9 11.2 4.6 12 1.5Z" fill="url(#fl)"/></svg>Insidious</div>
+      <div class="tag2" data-t="@c10~Festive-season|-0.2" data-a="up">Festive-season peace of mind for every self-hosted store.</div>
+      <div class="urls" data-t="@c10.end|-1.2" data-a="up"><span>Live: <b class="cfg-live-url">https://festive.aloysjehwin.com</b></span><span>Code: <b class="cfg-repo">see submission repo</b></span></div>
+      <div class="spons" data-t="@c10.end|-0.6" data-a="fade">Built with Flagsmith · NudgeBee · Sarvam AI · Claude &nbsp;·&nbsp; WeMakeDevs Festive Hacks 2026</div>
+    </div>
+    <div class="abs frame tilt" id="ops-shot" data-disabled="1" style="left:1060px;top:230px;width:740px;height:440px;display:none" data-t="@c10|+0.4" data-a="right"><img id="ops-img" class="kbimg"><div class="chip-proof in">Live ops cockpit · /ops</div></div>
+  </section>
+
+  <!-- persistent chrome -->
+  <div id="chrome">
+    <div id="brand"><svg viewBox="0 0 24 24"><path d="M12 1.5C15.5 6.5 19.5 9.6 19.5 14.6A7.5 7.5 0 0 1 4.5 14.6C4.5 11.2 6.6 9.1 8.4 6.9C8.8 9.2 9.8 10.4 11 10.9C10.6 7.9 11.2 4.6 12 1.5Z" fill="url(#fl)"/></svg><b>Insidious</b><span id="chapter"></span></div>
+    <div id="narrator"><div class="orb" id="orb"></div><div class="nl"><b>Sarvam AI narrator</b><span>Bulbul v4 voice</span></div><div id="wave"></div></div>
+    <div id="caption"><div class="ct" id="ct"></div><div class="cs" id="cs"></div></div>
+    <div id="progress"><i id="prog"></i></div>
+  </div>
+</div>
+<script src="../build/timeline.js"></script>
+<script src="engine.js"></script>
+</body>
+</html>

@@ -1,0 +1,64 @@
+# Insidious on Kubernetes (kind by default).
+#
+#   make config-sync                 # copy insidious.yaml + flagsmith/flags.yaml into ./generated/
+#   make secrets                     # Secret insidious-env from .env in ns store + insidious
+#   make deploy                      # = the two above + kubectl --context kind-insidious apply -k deploy/k8s
+#
+# kustomize refuses files outside this directory (../ paths), so the two config files are copied into
+# ./generated/ by `make config-sync`. The copies are committed so a fresh clone renders; the originals
+# at the repo root stay the source of truth.
+#
+# No top-level `namespace:` on purpose: resources live in two namespaces (store, insidious).
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+labels:
+  - pairs:
+      app.kubernetes.io/part-of: insidious
+    includeSelectors: false
+
+resources:
+  - namespaces.yaml
+  - store/store-api.yaml
+  - store/payments-mock.yaml
+  - insidious/guardian.yaml
+  - insidious/ops-bot.yaml
+  - insidious/rbac.yaml
+  - insidious/agent.yaml
+  - insidious/agent-rbac.yaml
+  - prometheus/prometheus.yaml
+  - ingress.yaml
+
+# Same ConfigMap in both namespaces, mounted at /config in every Insidious pod
+# (INSIDIOUS_CONFIG=/config/insidious.yaml, INSIDIOUS_FLAGS=/config/flags.yaml).
+configMapGenerator:
+  - name: insidious-config
+    namespace: store
+    files:
+      - insidious.yaml=generated/insidious.yaml
+      - flags.yaml=generated/flags.yaml
+  - name: insidious-config
+    namespace: insidious
+    files:
+      - insidious.yaml=generated/insidious.yaml
+      - flags.yaml=generated/flags.yaml
+  - name: prometheus-config
+    namespace: insidious
+    files:
+      - prometheus.yml=prometheus/prometheus.yml
+
+# The Secret `insidious-env` is NOT generated here (it holds real keys). The Makefile creates it from
+# .env:  kubectl create secret generic insidious-env --from-env-file=<sanitised .env> --dry-run=client -o yaml | kubectl apply -f -
+# Pods reference it with `optional: true`, so everything still starts (in mock mode) without it.
+
+# Retag for another registry (e.g. ECR on EKS) in an overlay rather than editing this file:
+#   images: [{name: insidious/store-api, newName: <acct>.dkr.ecr.<region>.amazonaws.com/insidious/store-api, newTag: v1}]
+images:
+  - name: insidious/store-api
+    newTag: dev
+  - name: insidious/payments-mock
+    newTag: dev
+  - name: insidious/guardian
+    newTag: dev
+  - name: insidious/ops-bot
+    newTag: dev

@@ -1,0 +1,7 @@
+{
+  "liveUrl": "festive.aloysjehwin.com",
+  "repoUrl": "github.com/<your-org>/insidious",
+  "fps": 30,
+  "workers": 6,
+  "musicVolume": 0.05
+}

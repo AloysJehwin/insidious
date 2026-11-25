@@ -1,0 +1,26 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+node_modules/
+reports/*.json
+reports/*.md
+!reports/.gitkeep
+*.ogg
+*.wav
+.DS_Store
+
+# video pipeline: keep sources, script and the final MP4; drop heavy intermediates
+video/node_modules/
+video/build/
+video/assets/live-ops*/
+video/out/festivekit-demo.mp4
+sdk/dist/
+*.egg-info/
+# scan output of the private Jeffi Stores codebase stays local
+examples/jeffi-scan/
+video/final/
+video/out/*.mp4
+!video/out/insidious-demo-final.mp4

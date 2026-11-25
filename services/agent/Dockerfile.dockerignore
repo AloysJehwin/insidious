@@ -1,0 +1,8 @@
+# Used by BuildKit for `docker build -f services/agent/Dockerfile .` (paths relative to the repo root)
+**/.venv
+**/__pycache__
+**/.pytest_cache
+**/data
+.env
+.env.*
+!.env.example

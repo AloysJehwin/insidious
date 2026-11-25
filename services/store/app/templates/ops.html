@@ -1,0 +1,1028 @@
+<!doctype html>
+<!-- Insidious MISSION CONTROL · /ops cockpit for Jeffi Stores -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark light">
+<title>Mission Control · Jeffi Stores · Insidious</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#0a0b0d; --panel:#111317; --panel-2:#16191e; --panel-3:#1c2026;
+  --line:#22262c; --line-2:#2d323a;
+  --text:#e7e9ec; --text-2:#a1a8b3; --text-3:#848c97;
+  --accent:#7c8dff; --accent-bg:rgba(124,141,255,.12); --accent-line:rgba(124,141,255,.45);
+  --ok:#4cc38a; --ok-bg:rgba(76,195,138,.10); --ok-line:rgba(76,195,138,.35);
+  --warn:#e5b04a; --warn-bg:rgba(229,176,74,.10); --warn-line:rgba(229,176,74,.38);
+  --crit:#f2685f; --crit-bg:rgba(242,104,95,.10); --crit-line:rgba(242,104,95,.42);
+  --chart-grid:rgba(255,255,255,.05); --chart-home:#8a93a0;
+  --shadow:0 8px 24px rgba(0,0,0,.45);
+  --sans:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --r:8px;
+}
+@media (prefers-color-scheme: light){
+  :root{
+    --bg:#f5f6f8; --panel:#ffffff; --panel-2:#f2f4f6; --panel-3:#e9ecef;
+    --line:#e2e5e9; --line-2:#d2d7dd;
+    --text:#14171b; --text-2:#4b535e; --text-3:#5f6773;
+    --accent:#4352d6; --accent-bg:rgba(67,82,214,.08); --accent-line:rgba(67,82,214,.4);
+    --ok:#17834e; --ok-bg:rgba(23,131,78,.08); --ok-line:rgba(23,131,78,.32);
+    --warn:#946200; --warn-bg:rgba(148,98,0,.08); --warn-line:rgba(148,98,0,.32);
+    --crit:#c53228; --crit-bg:rgba(197,50,40,.07); --crit-line:rgba(197,50,40,.35);
+    --chart-grid:rgba(0,0,0,.06); --chart-home:#7a828d;
+    --shadow:0 8px 24px rgba(20,23,27,.12);
+  }
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+html,body{margin:0}
+body{background:var(--bg);color:var(--text);font:400 14px/1.45 var(--sans);-webkit-font-smoothing:antialiased;
+  font-feature-settings:"cv11","ss01";caret-color:var(--accent);min-height:100vh}
+::selection{background:var(--accent-bg);color:var(--text)}
+*{scrollbar-width:thin;scrollbar-color:var(--line-2) transparent}
+::-webkit-scrollbar{width:8px;height:8px} ::-webkit-scrollbar-thumb{background:var(--line-2);border-radius:8px} ::-webkit-scrollbar-track{background:transparent}
+.num{font-variant-numeric:tabular-nums}
+code,.mono{font-family:var(--mono);font-size:12px}
+svg{display:block}
+
+/* top bar */
+.top{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--bg) 92%,transparent);border-bottom:1px solid var(--line);
+  backdrop-filter:saturate(1.2) blur(8px);-webkit-backdrop-filter:saturate(1.2) blur(8px)}
+.top-in{max-width:1600px;margin:0 auto;padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.crumbs{display:flex;align-items:center;gap:8px;min-width:0;white-space:nowrap}
+.crumbs .mark{width:24px;height:24px;flex:none}
+.crumbs .brand{font-weight:600;letter-spacing:-.01em}
+.crumbs .sep{color:var(--line-2);font-size:16px}
+.crumbs .store{color:var(--text-2)}
+.crumbs .page{color:var(--text);font-weight:500}
+.top-r{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.pill{display:inline-flex;align-items:center;gap:8px;height:28px;padding:0 10px;border:1px solid var(--line-2);border-radius:999px;
+  color:var(--text-2);font-size:12px;font-weight:500;white-space:nowrap;background:var(--panel)}
+.pill .dot{width:6px;height:6px;border-radius:50%;background:var(--text-3);flex:none}
+.pill.ok .dot{background:var(--ok)} .pill.crit{color:var(--crit);border-color:var(--crit-line)} .pill.crit .dot{background:var(--crit)}
+.pill.demo .dot{background:var(--accent)}
+.pill .t{color:var(--text)}
+.dot.beat{animation:beat .6s ease-out}
+@keyframes beat{0%{box-shadow:0 0 0 0 var(--ok-line)}100%{box-shadow:0 0 0 6px transparent}}
+
+.shell{max-width:1600px;margin:0 auto;padding:24px 24px 32px}
+
+/* incident status strip */
+.status{display:flex;align-items:center;gap:16px;padding:12px 16px;border:1px solid var(--line);border-radius:var(--r);background:var(--panel);margin-bottom:16px}
+.status .ic{width:32px;height:32px;border-radius:8px;display:grid;place-items:center;flex:none;background:var(--panel-2);color:var(--text-3)}
+.status .bd{min-width:0;flex:1}
+.status .h{font-weight:600;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.status .h code{color:var(--text-3);font-weight:400}
+.status .d{color:var(--text-2);font-size:13px;margin-top:2px}
+.status .tm{font:500 20px/1 var(--sans);font-variant-numeric:tabular-nums;color:var(--text-2);text-align:right;flex:none}
+.status .tm small{display:block;font-size:11px;color:var(--text-3);font-weight:400;margin-top:4px}
+.status.ok .ic{color:var(--ok);background:var(--ok-bg)}
+.status.firing{border-color:var(--crit-line);background:linear-gradient(var(--crit-bg),var(--crit-bg)),var(--panel)}
+.status.firing .ic{color:var(--crit);background:var(--crit-bg)} .status.firing .tm{color:var(--crit)}
+.status.resolved{border-color:var(--ok-line)} .status.resolved .ic{color:var(--ok);background:var(--ok-bg)} .status.resolved .tm{color:var(--ok)}
+
+/* KPI strip */
+.kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-bottom:16px}
+.kpi{background:var(--panel);padding:16px;min-width:0;display:flex;flex-direction:column;gap:4px}
+.kpi .k{color:var(--text-2);font-size:12px;font-weight:500;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.kpi .k .badge{font-size:11px}
+.kpi .v{font:600 28px/1.15 var(--sans);letter-spacing:-.02em;font-variant-numeric:tabular-nums;margin-top:4px;white-space:nowrap}
+.kpi .v small{font-size:14px;font-weight:500;color:var(--text-3);margin-left:4px;letter-spacing:0}
+.kpi .s{color:var(--text-3);font-size:12px;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kpi.crit .v{color:var(--crit)} .kpi.warn .v{color:var(--warn)} .kpi.ok .v{color:var(--text)}
+.meter{height:4px;border-radius:4px;background:var(--panel-3);overflow:hidden;margin-top:8px}
+.meter b{display:block;height:100%;border-radius:4px;background:var(--ok);width:0;transition:width .5s cubic-bezier(.16,1,.3,1)}
+.meter.warn b{background:var(--warn)} .meter.crit b{background:var(--crit)}
+.pods{display:flex;gap:4px;margin-top:8px;height:4px}
+.pods span{flex:1;height:4px;border-radius:4px;background:var(--panel-3)}
+.pods span.on{background:var(--text-2)}
+.badge{display:inline-flex;align-items:center;gap:6px;height:20px;padding:0 8px;border-radius:999px;font-size:11px;font-weight:500;
+  background:var(--panel-2);color:var(--text-2);border:1px solid var(--line);white-space:nowrap}
+.badge.ok{color:var(--ok);background:var(--ok-bg);border-color:var(--ok-line)}
+.badge.warn{color:var(--warn);background:var(--warn-bg);border-color:var(--warn-line)}
+.badge.crit{color:var(--crit);background:var(--crit-bg);border-color:var(--crit-line)}
+.badge.accent{color:var(--accent);background:var(--accent-bg);border-color:var(--accent-line)}
+
+/* layout */
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 384px;gap:16px;align-items:start}
+.col{display:flex;flex-direction:column;gap:16px;min-width:0}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);min-width:0}
+.ph{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;border-bottom:1px solid var(--line);min-height:52px}
+.ph h2{margin:0;font-size:14px;font-weight:600;letter-spacing:-.005em;display:flex;align-items:center;gap:8px}
+.ph .meta{color:var(--text-3);font-size:12px;text-align:right;min-width:0}
+.ph .meta b{color:var(--text-2);font-weight:500}
+.pb{padding:16px}
+.empty{color:var(--text-3);font-size:13px;padding:8px 0}
+
+/* chart */
+.chart{position:relative;height:300px}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--text-2);margin-bottom:12px}
+.legend span{display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+.legend i{width:14px;height:2px;border-radius:2px;display:inline-block}
+.legend i.dash{height:0;border-top:2px dashed currentColor;background:none!important}
+.legend .val{color:var(--text);font-variant-numeric:tabular-nums;font-weight:500}
+
+/* business impact */
+.imp-fig{display:flex;flex-direction:column;gap:4px}
+.imp-fig .lbl{color:var(--text-2);font-size:12px;font-weight:500}
+.imp-fig .big{font:600 32px/1.1 var(--sans);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.imp-fig .big.crit{color:var(--crit)} .imp-fig .big.ok{color:var(--ok)}
+.imp-fig .sub{color:var(--text-3);font-size:12px;font-variant-numeric:tabular-nums}
+.imp-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+.imp-row .imp-fig .big{font-size:20px}
+.imp-sec{border-top:1px solid var(--line);margin-top:16px;padding-top:16px}
+.imp-lines{list-style:none;margin:8px 0 0;padding:0;font-size:13px}
+.imp-lines li{display:flex;justify-content:space-between;gap:12px;padding:4px 0;color:var(--text-2)}
+.imp-lines li span:last-child{color:var(--text);font-variant-numeric:tabular-nums;white-space:nowrap}
+.imp-lines li.none{color:var(--text-3)}
+.payback{margin-top:12px;padding:10px 12px;border-radius:6px;background:var(--panel-2);border:1px solid var(--line);font-size:13px;color:var(--text-2)}
+.payback b{color:var(--text);font-weight:600;font-variant-numeric:tabular-nums}
+.payback[hidden]{display:none}
+.inputs{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.field label{font-size:12px;color:var(--text-2);font-weight:500}
+.field .in{display:flex;align-items:center;height:32px;border:1px solid var(--line-2);border-radius:6px;background:var(--panel-2);padding:0 8px;gap:4px}
+.field .in:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-bg)}
+.field .in span{color:var(--text-3);font-size:13px}
+.field input{all:unset;flex:1;min-width:0;font:500 13px var(--sans);color:var(--text);font-variant-numeric:tabular-nums}
+.assume{color:var(--text-3);font-size:12px;margin:12px 0 0}
+
+/* agent plan */
+.wf{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:12px}
+.wf .name{font-weight:600}
+.wf code{color:var(--text-3);display:block;margin-top:2px;font-size:11px}
+.plan-sum{font-size:13px;color:var(--text-2);margin:0 0 12px;padding:10px 12px;border-radius:6px;background:var(--panel-2);border:1px solid var(--line)}
+.tl{list-style:none;margin:0;padding:0;position:relative}
+.tl li{position:relative;display:grid;grid-template-columns:20px minmax(0,1fr);gap:12px;padding:0 0 14px}
+.tl li:last-child{padding-bottom:0}
+.tl li::before{content:"";position:absolute;left:9.5px;top:22px;bottom:2px;width:1px;background:var(--line-2)}
+.tl li:last-child::before{display:none}
+.tl .ico{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;border:1px solid var(--line-2);background:var(--panel);color:var(--text-3)}
+.tl .done .ico{border-color:var(--ok-line);background:var(--ok-bg);color:var(--ok)}
+.tl .failed .ico{border-color:var(--crit-line);background:var(--crit-bg);color:var(--crit)}
+.tl .waiting .ico{border-color:var(--warn-line);background:var(--warn-bg);color:var(--warn)}
+.tl .running .ico{border:2px solid var(--accent-line);border-top-color:var(--accent);animation:spin .9s linear infinite}
+.tl .step b{display:block;font-size:13px;font-weight:500;line-height:20px}
+.tl .step span{display:block;color:var(--text-3);font-size:12px;overflow-wrap:anywhere}
+.tl .waiting .step b{color:var(--warn)}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* activity feed */
+.feed{list-style:none;margin:0;padding:0 16px;max-height:360px;overflow:auto}
+.feed li{padding:12px 0;border-bottom:1px solid var(--line)}
+.feed li:last-child{border-bottom:0}
+.feed .row1{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:4px}
+.feed time{color:var(--text-3);font-size:12px;font-variant-numeric:tabular-nums}
+.feed p{margin:0;font-size:13px;color:var(--text);overflow-wrap:anywhere}
+.src{display:inline-flex;align-items:center;gap:6px;font:500 11px/1 var(--mono);color:var(--text-2);padding:4px 6px;border-radius:4px;background:var(--panel-2);border:1px solid var(--line)}
+.src::before{content:"";width:5px;height:5px;border-radius:1px;background:var(--text-3)}
+.src.agent::before,.src.nudgebee::before{background:var(--accent)}
+.feed li.new{animation:newrow 2s ease-out}
+@keyframes newrow{from{background:var(--accent-bg)}to{background:transparent}}
+
+/* experiment */
+.ab{display:flex;flex-direction:column;gap:12px}
+.ab .row{display:grid;grid-template-columns:48px minmax(0,1fr) 56px;gap:12px;align-items:center;font-size:13px}
+.ab .row span:last-child{text-align:right;font-variant-numeric:tabular-nums;font-weight:500}
+.ab .track{height:6px;border-radius:6px;background:var(--panel-3);overflow:hidden}
+.ab .track b{display:block;height:100%;border-radius:6px;transition:width .6s cubic-bezier(.16,1,.3,1)}
+.ab .meta{color:var(--text-3);font-size:12px;margin:-6px 0 0 60px;font-variant-numeric:tabular-nums}
+
+/* feature flags (Flagsmith Admin API) */
+.ff-note{color:var(--text-3);font-size:12px;margin:0 0 12px}
+.ff-note:empty{display:none}
+.ff-note.err{color:var(--crit)}
+.ff-grid{columns:2 340px;column-gap:16px}
+.ff-group{break-inside:avoid;border:1px solid var(--line);border-radius:6px;margin:0 0 16px;background:var(--panel)}
+.ff-group h3{margin:0;padding:8px 12px;font-size:12px;font-weight:500;color:var(--text-2);display:flex;justify-content:space-between;gap:8px;
+  background:var(--panel-2);border-bottom:1px solid var(--line);border-radius:6px 6px 0 0}
+.ff-group h3 span:last-child{color:var(--text-3);font-variant-numeric:tabular-nums}
+.ff-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px;border-top:1px solid var(--line)}
+.ff-group h3 + .ff-row{border-top:0}
+.ff-row .nm{font:500 12.5px var(--mono);display:flex;align-items:center;gap:8px;flex-wrap:wrap;overflow-wrap:anywhere;color:var(--text)}
+.ff-row .ds{color:var(--text-3);font-size:12px;line-height:1.4;margin-top:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.ff-row .vl{margin-top:8px;display:flex;align-items:center;gap:8px;min-width:0}
+.ff-row .vl span{color:var(--text-3);font-size:11px;flex:none}
+.ff-val{font:400 11.5px var(--mono);color:var(--text-2);background:var(--panel-2);border:1px solid var(--line);border-radius:4px;padding:2px 6px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ff-val.masked{color:var(--text-3)}
+.ff-sel{font:500 12px var(--mono);color:var(--text);background:var(--panel-2);border:1px solid var(--line-2);border-radius:6px;padding:4px 8px;min-height:30px}
+.ff-sel:disabled{opacity:.5}
+.ff-row .ctl{display:flex;align-items:center;gap:10px}
+.ff-row .stt{font-size:12px;font-weight:500;min-width:32px;text-align:right;color:var(--text-3)}
+.ff-row.on .stt{color:var(--text-2)}
+.ff-row.off.alert .stt,.ff-row.shed .stt{color:var(--warn)}
+.ff-row.child{padding-left:28px;position:relative}
+.ff-row.child::before{content:"";position:absolute;left:16px;top:0;height:22px;width:8px;border-left:1px solid var(--line-2);border-bottom:1px solid var(--line-2);border-bottom-left-radius:4px}
+.ff-row.parent{background:var(--panel-2)}
+.ff-row.parent.off{background:linear-gradient(var(--warn-bg),var(--warn-bg)),var(--panel)}
+.ff-badge{font:500 10.5px var(--sans);color:var(--text-2);border:1px solid var(--line-2);padding:1px 6px;border-radius:999px}
+.ff-row.flash{animation:newrow 1.6s ease-out}
+.sw{position:relative;width:36px;height:20px;border-radius:999px;border:1px solid var(--line-2);background:var(--panel-3);cursor:pointer;flex:none;padding:0;transition:background .2s,border-color .2s}
+.sw::after{content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:var(--text-3);transition:transform .2s cubic-bezier(.16,1,.3,1),background .2s}
+.sw:hover:not(:disabled){border-color:var(--text-3)}
+.sw[aria-checked="true"]{background:var(--accent);border-color:var(--accent)}
+.sw[aria-checked="true"]::after{transform:translateX(16px);background:#fff}
+.sw:disabled{opacity:.4;cursor:not-allowed}
+.sw.busy{cursor:progress}
+.sw.busy::after{animation:swbusy .7s ease-in-out infinite alternate}
+.sw:focus-visible,.ff-sel:focus-visible,.field input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@keyframes swbusy{to{opacity:.35}}
+
+.toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,8px);opacity:0;pointer-events:none;z-index:30;max-width:calc(100vw - 32px);
+  background:var(--panel-3);border:1px solid var(--line-2);color:var(--text);border-radius:var(--r);padding:10px 14px;font-size:13px;font-weight:500;
+  box-shadow:var(--shadow);transition:opacity .2s,transform .2s cubic-bezier(.16,1,.3,1)}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.toast.err{border-color:var(--crit-line);color:var(--crit)}
+.foot{color:var(--text-3);font-size:12px;margin-top:24px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.foot code{font-size:11px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+@media (max-width:1180px){
+  .layout{grid-template-columns:1fr}
+  .col{display:contents}
+  .o-chart{order:1}.o-impact{order:2}.o-plan{order:3}.o-feed{order:4}.o-flags{order:5}.o-ab{order:6}
+}
+@media (max-width:900px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.kpis .kpi:last-child{grid-column:1/-1}}
+@media (max-width:640px){
+  .top-in{height:auto;padding:10px 16px;flex-wrap:wrap;row-gap:8px}
+  .crumbs .sep.s2,.crumbs .page,#armed{display:none!important}
+  .top-r{width:100%;justify-content:flex-start;gap:6px}
+  .pill{height:26px;padding:0 8px;font-size:11.5px}
+  .kpi .s{white-space:normal}
+  .ph .meta .hint{display:none}
+  .shell{padding:16px 16px 24px}
+  .status{flex-wrap:wrap;gap:12px;padding:12px}
+  .status .tm{text-align:left;font-size:16px}
+  .kpi{padding:12px}
+  .kpi .v{font-size:22px}
+  .chart{height:220px}
+  .ph{padding:12px}
+  .pb{padding:12px}
+  .feed{padding:0 12px}
+  .ff-grid{columns:1}
+  .toast{bottom:16px}
+}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="top-in">
+    <div class="crumbs">
+      <svg class="mark" viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="6" fill="var(--text)"/><path d="M12 5.5c2.3 2.7 3.9 4.6 3.9 7.2a3.9 3.9 0 0 1-7.8 0c0-2.6 1.6-4.5 3.9-7.2z" fill="var(--bg)"/><rect x="7" y="17.6" width="10" height="1.6" rx=".8" fill="var(--bg)"/></svg>
+      <span class="brand">Insidious</span>
+      <span class="sep" aria-hidden="true">/</span>
+      <span class="store">Jeffi Stores</span>
+      <span class="sep s2" aria-hidden="true">/</span>
+      <span class="page">Mission control</span>
+    </div>
+    <div class="top-r">
+      <span class="pill" title="Environment"><span class="dot" style="background:var(--accent)"></span>Production · ap-south-1</span>
+      <span class="pill" id="armed" hidden><span class="dot"></span><span>Guard</span></span>
+      <span class="pill" id="live" role="status" aria-live="off"><span class="dot" id="live-dot"></span><span id="live-t">Connecting…</span></span>
+    </div>
+  </div>
+</header>
+
+<main class="shell">
+  <section class="status" id="status" aria-live="polite">
+    <div class="ic" id="s-ic"></div>
+    <div class="bd"><div class="h" id="s-h">Connecting to guardian</div><div class="d" id="s-d">Waiting for the first sample…</div></div>
+    <div class="tm" id="s-tm"></div>
+  </section>
+
+  <section class="kpis" aria-label="Key metrics">
+    <div class="kpi" id="k-checkout"><div class="k">Checkout p95</div><div class="v">—</div><div class="s">SLO 800 ms</div><div class="meter"><b></b></div></div>
+    <div class="kpi" id="k-rps"><div class="k">Requests / s</div><div class="v">—</div><div class="s">all routes · 30 s rate</div></div>
+    <div class="kpi" id="k-rep" title="store-api replicas"><div class="k">Servers</div><div class="v">—</div><div class="s">store-api replicas</div><div class="pods" aria-hidden="true"></div></div>
+    <div class="kpi" id="k-db"><div class="k">DB connections</div><div class="v">—</div><div class="s">in use / pool capacity</div><div class="meter"><b></b></div></div>
+    <div class="kpi" id="k-inc"><div class="k">Incident</div><div class="v">—</div><div class="s">—</div></div>
+  </section>
+
+  <div class="layout">
+    <div class="col">
+      <section class="panel o-chart">
+        <div class="ph"><h2>p95 latency by route</h2><span class="meta" id="chart-note">last 15 min · 5 s samples</span></div>
+        <div class="pb">
+          <div class="legend" id="legend"></div>
+          <div class="chart"><canvas id="chart" role="img" aria-label="p95 latency per route over time"></canvas></div>
+        </div>
+      </section>
+
+      <section class="panel o-flags" id="ff">
+        <div class="ph"><h2>Feature flags · Flagsmith</h2><span class="meta" id="ff-src">loading…</span></div>
+        <div class="pb">
+          <div class="ff-note" id="ff-note"></div>
+          <div class="ff-grid" id="ff-grid"><div class="empty">Loading flags…</div></div>
+        </div>
+      </section>
+
+      <section class="panel o-ab">
+        <div class="ph"><h2>Experiment · checkout_flow</h2><span class="meta">metric: order_placed</span></div>
+        <div class="pb"><div class="ab" id="ab"><div class="empty">Waiting for checkouts…</div></div></div>
+      </section>
+    </div>
+
+    <div class="col">
+      <section class="panel o-impact" aria-labelledby="imp-h">
+        <div class="ph"><h2 id="imp-h">Business impact</h2><span class="badge">Estimate</span></div>
+        <div class="pb">
+          <div class="imp-fig">
+            <span class="lbl">Revenue at risk / hour</span>
+            <span class="big" id="imp-risk">—</span>
+            <span class="sub" id="imp-why">Waiting for checkout latency…</span>
+          </div>
+          <div class="imp-row">
+            <div class="imp-fig"><span class="lbl">Orders lost / hour</span><span class="big" id="imp-orders">—</span></div>
+            <div class="imp-fig"><span class="lbl">Conversion drop</span><span class="big" id="imp-loss">—</span></div>
+          </div>
+          <div class="imp-sec">
+            <div class="imp-fig"><span class="lbl">Cost of today's fixes</span><span class="big num" id="imp-cost" style="font-size:20px">—</span></div>
+            <ul class="imp-lines" id="imp-lines"></ul>
+            <div class="payback" id="imp-pay" hidden></div>
+          </div>
+          <div class="imp-sec">
+            <div class="inputs">
+              <div class="field"><label for="in-aov">Avg order value</label><div class="in"><span>₹</span><input id="in-aov" type="number" inputmode="numeric" min="0" step="50" aria-describedby="imp-assume"></div></div>
+              <div class="field"><label for="in-oph">Orders / hour, healthy</label><div class="in"><input id="in-oph" type="number" inputmode="numeric" min="0" step="10" aria-describedby="imp-assume"></div></div>
+            </div>
+            <p class="assume" id="imp-assume">≈7% fewer orders per extra second of delay — industry estimate. Applied to checkout p95 above the 800 ms SLO, capped at 60%. Servers ₹4/hour each above one, read replica ₹1.5/hour, larger DB pool free.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel o-plan">
+        <div class="ph"><h2>AI agent plan</h2><span class="meta" id="exec-time"></span></div>
+        <div class="pb" id="exec"><div class="empty">No plan yet. The agent proposes one when an SLO breach fires.</div></div>
+      </section>
+
+      <section class="panel o-feed">
+        <div class="ph"><h2>Activity</h2><span class="meta">who changed what</span></div>
+        <ul class="feed" id="feed"><li class="empty">No changes yet.</li></ul>
+      </section>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <footer class="foot"><span id="foot-l">pod {{ pod }}</span><span>polling /ops/state every 1 s · guardian <code>{{ guardian_url }}</code></span></footer>
+</main>
+
+<script>
+(function () {
+  "use strict";
+  const qs = new URLSearchParams(location.search);
+  const DEMO = qs.get("demo") === "1";
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const fmtTime = (d) => d.toLocaleTimeString("en-GB", { hour12: false, timeZone: "Asia/Kolkata" });
+  const tsLabel = (ts) => { const d = new Date(ts); return isNaN(d) ? String(ts || "").slice(11, 19) : fmtTime(d); };
+  const dur = (ms) => { const s = Math.max(0, Math.floor(ms / 1000)); return String(Math.floor(s / 60)).padStart(2, "0") + ":" + String(s % 60).padStart(2, "0"); };
+  const nIN = (n, dp) => Number(n).toLocaleString("en-IN", { maximumFractionDigits: dp || 0 });
+  const inr = (n, dp) => "₹" + nIN(dp ? n : Math.round(n), dp);
+  const cssVar = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  let feedSeen = new Set(), firstFeed = true, lastPayload = null;
+
+  const ICON = {
+    ok: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+    alert: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5l9.5 16.5h-19L12 3.5z"/><path d="M12 10v4.5M12 17.5h.01"/></svg>',
+    off: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M3 3l18 18M8.5 16.5a5 5 0 0 1 7 0M5 12.5a10 10 0 0 1 4-2.3M14.5 10.2a10 10 0 0 1 4.5 2.3M12 20h.01"/></svg>',
+    check: '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+    x: '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+    wait: '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M9 6v12M15 6v12"/></svg>',
+  };
+
+  // ---------------------------------------------------------------- chart
+  let chart = null;
+  function routeColor(r, i) {
+    if (r === "/checkout") return cssVar("--accent");
+    if (r === "/") return cssVar("--chart-home");
+    return ["#b48ead", "#88c0d0", "#d08770", "#a3be8c"][i % 4];
+  }
+  function ensureChart() {
+    if (chart || !window.Chart) return chart;
+    Chart.defaults.color = cssVar("--text-3");
+    Chart.defaults.font.family = "Inter, system-ui, sans-serif";
+    Chart.defaults.font.size = 11;
+    const grid = cssVar("--chart-grid");
+    chart = new Chart($("chart"), {
+      type: "line",
+      data: { labels: [], datasets: [] },
+      options: {
+        animation: false, responsive: true, maintainAspectRatio: false, normalized: true,
+        interaction: { mode: "index", intersect: false },
+        plugins: {
+          legend: { display: false },
+          tooltip: { backgroundColor: cssVar("--panel-3"), borderColor: cssVar("--line-2"), borderWidth: 1, titleColor: cssVar("--text"),
+            bodyColor: cssVar("--text-2"), padding: 10, cornerRadius: 6, boxPadding: 4, usePointStyle: true,
+            callbacks: { label: (c) => " " + c.dataset.label + "  " + (c.parsed.y == null ? "—" : nIN(c.parsed.y) + " ms") } },
+        },
+        scales: {
+          x: { grid: { display: false }, border: { color: cssVar("--line") }, ticks: { maxTicksLimit: 7, maxRotation: 0, autoSkipPadding: 16 } },
+          y: { beginAtZero: true, suggestedMax: 1000, grid: { color: grid, drawTicks: false }, border: { display: false },
+            ticks: { padding: 8, maxTicksLimit: 6, callback: (v) => nIN(v) + " ms" } },
+        },
+      },
+    });
+    return chart;
+  }
+  try {
+    window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
+      if (chart) { chart.destroy(); chart = null; }
+      if (lastPayload) render(lastPayload);
+    });
+  } catch (e) { /* old browsers */ }
+
+  function renderChart(state) {
+    const c = ensureChart();
+    const slo = state.slo || {};
+    const hist = (state.history || []).slice(-180);
+    const routes = Object.keys(slo).length ? Object.keys(slo) : Array.from(new Set(hist.flatMap((h) => Object.keys(h.p95_ms || {}))));
+    const labels = hist.map((h) => tsLabel(h.ts));
+    const sets = [], legend = [];
+    let maxY = 0;
+    routes.forEach((r, i) => {
+      const col = routeColor(r, i);
+      const hero = r === "/checkout";
+      const data = hist.map((h) => { const v = (h.p95_ms || {})[r]; return v == null || isNaN(v) ? null : Math.round(v); });
+      data.forEach((v) => { if (v != null) maxY = Math.max(maxY, v); });
+      sets.push({ label: "p95 " + r, data, borderColor: col, backgroundColor: hero ? col + "1a" : "transparent", fill: hero ? "origin" : false,
+        borderWidth: hero ? 2 : 1.5, pointRadius: 0, pointHoverRadius: 3, tension: 0.25, spanGaps: true, order: hero ? 1 : 2 });
+      const target = (slo[r] || {}).target_p95_ms;
+      if (target) {
+        maxY = Math.max(maxY, target);
+        const tcol = hero ? cssVar("--crit") : cssVar("--text-3");
+        sets.push({ label: "SLO " + r, data: hist.map(() => target), borderColor: tcol, borderDash: [5, 4], borderWidth: 1.25, pointRadius: 0, pointHoverRadius: 0, fill: false, order: 0 });
+      }
+      const cur = (slo[r] || {}).p95_ms;
+      legend.push(`<span><i style="background:${col}"></i>${esc(r)} p95 <span class="val">${cur == null || isNaN(cur) ? "—" : nIN(Math.round(cur)) + " ms"}</span></span>`);
+      if (target) legend.push(`<span style="color:${hero ? "var(--crit)" : "var(--text-3)"}"><i class="dash"></i><span style="color:var(--text-2)">SLO ${esc(r)} ${nIN(target)} ms</span></span>`);
+    });
+    $("legend").innerHTML = legend.join("") || '<span>No samples yet</span>';
+    const ck = slo["/checkout"] || {};
+    $("chart").setAttribute("aria-label", "p95 latency per route, last " + hist.length + " samples" + (ck.p95_ms != null ? ", checkout now " + Math.round(ck.p95_ms) + " ms against " + (ck.target_p95_ms || 800) + " ms SLO" : ""));
+    if (!c) return;
+    c.data.labels = labels;
+    c.data.datasets = sets;
+    c.options.scales.y.suggestedMax = Math.max(1000, Math.ceil(maxY * 1.15 / 100) * 100);
+    c.update("none");
+  }
+
+  // ---------------------------------------------------------------- KPIs
+  function setMeter(box, pct, level) {
+    const m = box.querySelector(".meter");
+    if (!m) return;
+    m.className = "meter " + (level || "");
+    m.querySelector("b").style.width = Math.max(0, Math.min(100, pct || 0)) + "%";
+  }
+  const MAX_REPLICAS = 5; // agent guardrail (insidious.yaml agent.guardrails.max_replicas)
+  function replicasOf(state) {
+    let reps = state.replicas;
+    if (reps && typeof reps === "object") reps = reps["store-api"] ?? Object.values(reps)[0];
+    return reps == null ? null : Number(reps);
+  }
+
+  function renderKpis(state, online) {
+    const slo = state.slo || {};
+    const ck = slo["/checkout"];
+    const box = $("k-checkout");
+    if (!ck || ck.p95_ms == null || isNaN(ck.p95_ms)) {
+      box.className = "kpi"; box.querySelector(".v").innerHTML = "—"; box.querySelector(".s").textContent = "SLO 800 ms"; setMeter(box, 0);
+    } else {
+      const v = ck.p95_ms, t = ck.target_p95_ms || 800;
+      const level = ck.breaching || v > t ? "crit" : v > t * 0.8 ? "warn" : "ok";
+      box.className = "kpi " + level;
+      box.querySelector(".v").innerHTML = nIN(Math.round(v)) + "<small>ms</small>";
+      const err = ck.error_rate == null ? "" : " · 5xx " + (ck.error_rate * 100).toFixed(1) + "%";
+      box.querySelector(".s").textContent = (v > t ? "+" + nIN(Math.round(v - t)) + " ms over " + nIN(t) + " ms SLO" : "SLO " + nIN(t) + " ms") + err;
+      box.querySelector(".s").title = ck.breach_count ? `breach ${ck.breach_count}/3` : "";
+      setMeter(box, (v / t) * 100, level);
+    }
+    const rps = state.rps;
+    $("k-rps").querySelector(".v").innerHTML = rps == null ? "—" : nIN(Math.round(rps)) + "<small>rps</small>";
+    const reps = replicasOf(state);
+    const rb = $("k-rep");
+    rb.querySelector(".v").innerHTML = reps == null ? "—" : reps + "<small>pod" + (reps === 1 ? "" : "s") + "</small>";
+    const slots = Math.max(MAX_REPLICAS, reps || 0);
+    rb.querySelector(".s").textContent = reps == null ? "store-api replicas" : `${reps > 1 ? "+" + (reps - 1) + " added" : "baseline"} · max ${MAX_REPLICAS}`;
+    rb.querySelector(".pods").innerHTML = reps == null ? "" : Array.from({ length: Math.min(12, slots) }, (_, i) => `<span class="${i < reps ? "on" : ""}"></span>`).join("");
+    renderDb(state.db);
+    renderIncidentKpi(state, online);
+  }
+
+  function renderDb(db) {
+    const box = $("k-db");
+    const p = db && db.primary;
+    if (!p || p.size == null) { box.className = "kpi"; box.querySelector(".v").innerHTML = "—"; box.querySelector(".s").textContent = "in use / pool capacity"; setMeter(box, 0); return; }
+    const util = p.utilisation, wait = p.wait_p95_s;
+    const level = p.breaching ? "crit" : util != null && util >= 0.7 ? "warn" : "ok";
+    box.className = "kpi " + level;
+    box.querySelector(".v").innerHTML = Math.round(p.in_use || 0) + "<small>/ " + Math.round(p.size) + "</small>";
+    const waitTxt = wait == null ? "wait —" : "wait p95 " + (wait < 1 ? Math.round(wait * 1000) + " ms" : wait.toFixed(1) + " s");
+    box.querySelector(".s").textContent = waitTxt + (db.replica || db.read_from_replica ? " · replica on" : "") + (p.breach_count ? ` · breach ${p.breach_count}/3` : "");
+    setMeter(box, util == null ? 0 : util * 100, level);
+  }
+
+  function renderIncidentKpi(state, online) {
+    const box = $("k-inc");
+    const inc = state.incident;
+    const st = inc && String(inc.status || "").toLowerCase();
+    if (!online) { box.className = "kpi"; box.querySelector(".v").textContent = "Unknown"; box.querySelector(".s").textContent = "guardian offline"; return; }
+    if (st === "firing") {
+      box.className = "kpi crit"; box.querySelector(".v").textContent = "Firing";
+      box.querySelector(".s").textContent = (inc.since ? "for " + dur(Date.now() - new Date(inc.since).getTime()) + " · " : "") + "checkout p95";
+    } else if (st === "resolved") {
+      box.className = "kpi ok"; box.querySelector(".v").innerHTML = '<span style="color:var(--ok)">Resolved</span>';
+      box.querySelector(".s").textContent = inc.since && inc.resolved_at ? "in " + dur(new Date(inc.resolved_at) - new Date(inc.since)) + " · auto-healed" : "auto-healed";
+    } else {
+      box.className = "kpi ok"; box.querySelector(".v").textContent = "None";
+      box.querySelector(".s").textContent = "all SLOs within target";
+    }
+  }
+
+  // ---------------------------------------------------------------- incident status strip
+  function renderStatus(payload, state) {
+    const b = $("status");
+    if (!payload.guardian_online) {
+      b.className = "status offline"; $("s-ic").innerHTML = ICON.off;
+      $("s-h").textContent = "Guardian offline";
+      $("s-d").textContent = "Cannot reach " + (payload.guardian_url || "guardian") + ". SLO data is unavailable; flags below are live from this pod.";
+      $("s-tm").textContent = ""; return;
+    }
+    const inc = state.incident;
+    const st = inc && String(inc.status || "").toLowerCase();
+    const ck = (state.slo || {})["/checkout"] || {};
+    if (st === "firing") {
+      b.className = "status firing"; $("s-ic").innerHTML = ICON.alert;
+      $("s-h").innerHTML = "Checkout latency incident <code>" + esc(inc.id || "") + "</code>";
+      const recovering = ck.p95_ms != null && ck.target_p95_ms && ck.p95_ms <= ck.target_p95_ms && !ck.breaching;
+      $("s-d").textContent = recovering
+        ? `Recovering: checkout p95 ${nIN(Math.round(ck.p95_ms))} ms is back under the ${ck.target_p95_ms} ms SLO. Resolves after 3 healthy samples.`
+        : (inc.title || `Checkout p95 ${nIN(Math.round(ck.p95_ms || 0))} ms breaches the ${ck.target_p95_ms || 800} ms SLO at ${nIN(Math.round(state.rps || 0))} rps. NudgeBee RCA and AI agent engaged.`);
+      $("s-tm").innerHTML = inc.since ? dur(Date.now() - new Date(inc.since).getTime()) + "<small>elapsed</small>" : "";
+    } else if (st === "resolved") {
+      b.className = "status resolved"; $("s-ic").innerHTML = ICON.ok;
+      $("s-h").innerHTML = "Resolved <code>" + esc(inc.id || "incident") + "</code>";
+      $("s-d").textContent = `Checkout p95 back to ${nIN(Math.round(ck.p95_ms || 0))} ms (SLO ${ck.target_p95_ms || 800} ms). Healed by Insidious, NudgeBee and Flagsmith.`;
+      $("s-tm").innerHTML = inc.since && inc.resolved_at ? dur(new Date(inc.resolved_at) - new Date(inc.since)) + "<small>time to heal</small>" : "";
+    } else {
+      b.className = "status ok"; $("s-ic").innerHTML = ICON.ok;
+      $("s-h").textContent = "All systems normal";
+      $("s-d").textContent = `Watching ${Object.keys(state.slo || {}).length || 0} SLO routes every 5 s. Alerts NudgeBee and the AI agent after 3 consecutive breaches.`;
+      $("s-tm").textContent = "";
+    }
+  }
+
+  // ---------------------------------------------------------------- business impact (client-side estimate)
+  const IMPACT_KEY = "fk_ops_impact";
+  const LOSS_PER_SEC = 0.07, LOSS_CAP = 0.6, SERVER_PER_H = 4, REPLICA_PER_H = 1.5, BASE_POOL = 5;
+  const impact = { aov: 1800, oph: 600 };
+  try {
+    const s = JSON.parse(localStorage.getItem(IMPACT_KEY) || "null");
+    if (s && Number(s.aov) >= 0) impact.aov = Number(s.aov);
+    if (s && Number(s.oph) >= 0) impact.oph = Number(s.oph);
+  } catch (e) { /* storage blocked */ }
+  $("in-aov").value = impact.aov; $("in-oph").value = impact.oph;
+  [["in-aov", "aov"], ["in-oph", "oph"]].forEach(([id, key]) => {
+    $(id).addEventListener("input", () => {
+      const v = Number($(id).value);
+      if (!isFinite(v) || v < 0 || $(id).value === "") return;
+      impact[key] = v;
+      try { localStorage.setItem(IMPACT_KEY, JSON.stringify(impact)); } catch (e) { /* storage blocked */ }
+      if (lastPayload) renderImpact(lastPayload);
+    });
+  });
+  function riskFor(p95, target) {
+    const overS = Math.max(0, (p95 - target) / 1000);
+    const loss = Math.min(LOSS_CAP, overS * LOSS_PER_SEC);
+    const orders = impact.oph * loss;
+    return { overMs: Math.max(0, p95 - target), loss, orders, revenue: orders * impact.aov };
+  }
+  function renderImpact(payload) {
+    const online = payload.guardian_online;
+    const state = (online && payload.state) || {};
+    const ck = (state.slo || {})["/checkout"];
+    const riskEl = $("imp-risk");
+    let cur = null, target = 800;
+    if (!online || !ck || ck.p95_ms == null || isNaN(ck.p95_ms)) {
+      riskEl.textContent = "—"; riskEl.className = "big";
+      $("imp-why").textContent = online ? "Waiting for checkout latency…" : "Guardian offline: no latency data";
+      $("imp-orders").textContent = "—"; $("imp-loss").textContent = "—";
+    } else {
+      target = ck.target_p95_ms || 800;
+      cur = riskFor(ck.p95_ms, target);
+      if (cur.revenue > 0) {
+        riskEl.textContent = "≈ " + inr(cur.revenue); riskEl.className = "big crit";
+        $("imp-why").textContent = `Checkout p95 ${nIN(Math.round(ck.p95_ms))} ms is ${nIN(Math.round(cur.overMs))} ms over the ${nIN(target)} ms SLO`;
+      } else {
+        riskEl.textContent = "₹0"; riskEl.className = "big ok";
+        $("imp-why").textContent = "₹0 at risk — checkout within SLO";
+      }
+      $("imp-orders").textContent = "≈ " + nIN(Math.round(cur.orders));
+      $("imp-loss").textContent = (cur.loss * 100).toFixed(1) + "%";
+    }
+    // cost of fixes
+    const reps = replicasOf(state);
+    const db = state.db || {};
+    const lines = [];
+    let cost = 0;
+    if (reps != null && reps > 1) { const c = (reps - 1) * SERVER_PER_H; cost += c; lines.push([`+${reps - 1} server${reps - 1 === 1 ? "" : "s"} (${reps} total)`, inr(c, 1) + "/h"]); }
+    if (db.replica || ((payload.store || {}).db || {}).read_from_replica) { cost += REPLICA_PER_H; lines.push(["Read replica", inr(REPLICA_PER_H, 1) + "/h"]); }
+    const sf = Object.assign({}, state.flags || {}, (payload.store || {}).flags || {});
+    if (sf.heavy_features === false) lines.push(["Shed heavy features (Flagsmith)", "free"]);
+    const pool = db.primary && db.primary.size;
+    if (pool != null && pool > BASE_POOL) lines.push([`Larger DB pool (${BASE_POOL} → ${Math.round(pool)})`, "free"]);
+    $("imp-cost").textContent = online ? "≈ " + inr(cost, 1) + " / hour" : "—";
+    $("imp-lines").innerHTML = lines.length ? lines.map(([a, b]) => `<li><span>${esc(a)}</span><span>${esc(b)}</span></li>`).join("")
+      : '<li class="none"><span>No fixes applied yet</span><span>₹0/h</span></li>';
+    // payback: against current risk, or the peak risk in the visible history once healthy again
+    let base = cur && cur.revenue > 0 ? cur.revenue : 0, basis = "current";
+    if (!base && online) {
+      let peak = 0;
+      (state.history || []).forEach((h) => { const v = (h.p95_ms || {})["/checkout"]; if (v != null && !isNaN(v)) peak = Math.max(peak, v); });
+      const pr = riskFor(peak, target);
+      if (pr.revenue > 0) { base = pr.revenue; basis = "peak"; }
+    }
+    const pay = $("imp-pay");
+    if (base > 0 && cost > 0) {
+      pay.hidden = false;
+      pay.innerHTML = `Fix pays for itself <b>${nIN(Math.round(base / cost))}×</b> over` +
+        (basis === "peak" ? ` <span style="color:var(--text-3)">vs. the ${esc(inr(base))}/h peak at risk in the last 15 min</span>` : ` <span style="color:var(--text-3)">vs. revenue at risk now</span>`);
+    } else { pay.hidden = true; }
+  }
+
+  // ---------------------------------------------------------------- AI agent plan / execution timeline
+  const TASK_NAMES = {
+    "llm.classify": "AI picks remediation", "core.approval": "Founder approval · WhatsApp voice", "core.switch": "Branch on decision",
+    "k8s.horizontal_rightsize": "Scale store-api", "http": "HTTP call", "llm.summary": "AI summary",
+  };
+  const STATUS_LABEL = { done: "Done", running: "Running", waiting: "Awaiting approval", failed: "Failed", pending: "Pending" };
+  const STATUS_BADGE = { done: "ok", running: "accent", waiting: "warn", failed: "crit", pending: "" };
+  function statusClass(s) {
+    s = String(s || "").toUpperCase();
+    if (/COMPLETE|SUCCE|DONE|APPROVED|FINISHED/.test(s)) return "done";
+    if (/WAIT|APPROVAL|PAUSE|BLOCK/.test(s)) return "waiting";
+    if (/RUN|PROGRESS|START|EXECUT/.test(s)) return "running";
+    if (/FAIL|ERROR|TIMED|REJECT|CANCEL/.test(s)) return "failed";
+    return "pending";
+  }
+  function renderExec(ex, plan) {
+    const hasPlan = plan && (plan.founder_summary_en || plan.technical_summary);
+    if ((!ex || (!ex.tasks && !ex.status)) && !hasPlan) {
+      $("exec").innerHTML = '<div class="empty">No plan yet. The agent proposes one when an SLO breach fires.</div>'; $("exec-time").textContent = ""; return;
+    }
+    ex = ex || {};
+    const cls = statusClass(ex.status || plan.status);
+    const tasks = (ex.tasks || []).map((t) => {
+      const c = statusClass(t.status);
+      const name = t.name || TASK_NAMES[t.type] || t.type || t.id;
+      const icon = c === "done" ? ICON.check : c === "failed" ? ICON.x : c === "waiting" ? ICON.wait : "";
+      const sub = c === "waiting" ? "Waiting for Ravi to approve on WhatsApp" : (t.detail || t.type || "");
+      return `<li class="${c}"><span class="ico">${icon}</span><div class="step"><b>${esc(name)}</b><span>${esc(sub)}${sub ? " · " : ""}${esc(STATUS_LABEL[c])}</span></div></li>`;
+    }).join("");
+    const summary = hasPlan ? `<p class="plan-sum">${esc(plan.founder_summary_en || plan.technical_summary)}</p>` : "";
+    $("exec").innerHTML = `<div class="wf"><div style="min-width:0"><div class="name">${esc(ex.workflow || (plan && plan.id) || "plan")}</div><code>${esc(String(ex.execution_id || "").slice(0, 24))}</code></div>` +
+      `<span class="badge ${STATUS_BADGE[cls]}">${esc(STATUS_LABEL[cls])}</span></div>${summary}` + (tasks ? `<ul class="tl">${tasks}</ul>` : "");
+    $("exec-time").textContent = ex.start_time ? "NudgeBee · started " + tsLabel(ex.start_time) : "NudgeBee";
+  }
+
+  // ---------------------------------------------------------------- activity feed
+  const SOURCES = { flagsmith: "Flagsmith", agent: "AI agent", nudgebee: "NudgeBee", guardian: "Guardian", dashboard: "Dashboard", "ops-bot": "Ops bot" };
+  function renderFeed(feed) {
+    feed = (feed || []).slice(-50).reverse();
+    if (!feed.length) { $("feed").innerHTML = '<li class="empty">No changes yet.</li>'; return; }
+    $("feed").innerHTML = feed.map((f) => {
+      const key = (f.ts || "") + "|" + (f.text || "");
+      const isNew = !firstFeed && !feedSeen.has(key);
+      feedSeen.add(key);
+      const src = String(f.source || "other").toLowerCase();
+      const known = SOURCES[src] ? src : "other";
+      return `<li class="${isNew ? "new" : ""}"><div class="row1"><span class="src ${known}">${esc(SOURCES[src] || src)}</span><time>${esc(tsLabel(f.ts))}</time></div><p>${esc(f.text)}</p></li>`;
+    }).join("");
+    firstFeed = false;
+  }
+
+  // ---------------------------------------------------------------- A/B
+  function renderAB(exp) {
+    exp = exp || {};
+    const vs = Object.keys(exp);
+    if (!vs.length) { $("ab").innerHTML = '<div class="empty">Waiting for checkouts…</div>'; return; }
+    const cols = { full: "var(--text-3)", lite: "var(--accent)" };
+    $("ab").innerHTML = vs.map((v) => {
+      const e = exp[v] || {}; const r = e.conversion_rate == null ? 0 : e.conversion_rate;
+      return `<div class="row"><span>${esc(v)}</span><div class="track"><b style="width:${(r * 100).toFixed(1)}%;background:${cols[v] || "var(--text-2)"}"></b></div><span>${(r * 100).toFixed(1)}%</span></div><div class="meta">${nIN(e.conversions || 0)} orders / ${nIN(e.exposures || 0)} checkouts</div>`;
+    }).join("");
+  }
+
+  // ---------------------------------------------------------------- top bar
+  function renderTop(payload, state) {
+    const live = $("live"), dot = $("live-dot");
+    const now = fmtTime(new Date()) + " IST";
+    if (DEMO) { live.className = "pill demo"; $("live-t").innerHTML = 'Demo data · <span class="t num">' + now + "</span>"; }
+    else if (payload.guardian_online) { live.className = "pill ok"; $("live-t").innerHTML = 'Live · <span class="t num">' + now + "</span>"; }
+    else { live.className = "pill crit"; $("live-t").innerHTML = "Guardian offline · " + now; }
+    dot.classList.remove("beat"); void dot.offsetWidth; dot.classList.add("beat");
+    const armed = $("armed");
+    if (!state) { armed.hidden = true; return; }
+    armed.hidden = false;
+    armed.className = "pill" + (state.armed ? " ok" : "");
+    armed.lastElementChild.textContent = state.armed ? "Guard armed" : "Guard disarmed";
+  }
+
+  function render(payload) {
+    lastPayload = payload;
+    const online = !!payload.guardian_online;
+    const state = payload.state || {};
+    renderTop(payload, online ? state : null);
+    renderStatus(payload, state);
+    renderKpis(online ? state : {}, online);
+    renderChart(online ? state : {});
+    renderImpact(payload);
+    renderExec(online ? state.last_execution : null, online ? (state.plan || state.last_plan) : null);
+    renderFeed(online ? state.feed : []);
+    renderAB(payload.store && payload.store.experiment);
+    $("foot-l").textContent = "pod " + ((payload.store && payload.store.pod) || "{{ pod }}") + (DEMO ? " · simulated scenario (?demo=1)" : "");
+  }
+
+  // ---------------------------------------------------------------- live polling
+  async function poll() {
+    try {
+      const r = await fetch("/ops/state", { cache: "no-store" });
+      render(await r.json());
+    } catch (e) {
+      render({ guardian_online: false, guardian_url: "(store unreachable)", state: null, store: null });
+    }
+  }
+
+  // ---------------------------------------------------------------- demo simulation (?demo=1[&at=55][&freeze=1])
+  function demo() {
+    const CYCLE = 130, start = Date.now() - (Number(qs.get("at")) || 0) * 1000;
+    const freeze = qs.get("freeze") === "1";
+    const rnd = (seed) => { const x = Math.sin(seed * 12.9898) * 43758.5453; return x - Math.floor(x); };
+    const hist = [];
+    function sample(t, n) {
+      // t = seconds into the scenario; n = noise seed
+      let rps, ck, home;
+      if (t < 25) { rps = 140 + t * 4; ck = 210 + rps * 0.18; home = 160 + rps * 0.1; }
+      else if (t < 46) { const k = (t - 25) / 21; rps = 240 + k * 190; ck = 300 + Math.pow(k, 2.2) * 1560; home = 220 + Math.pow(k, 2) * 760; }
+      else if (t < 64) { rps = 430 + rnd(n) * 12; ck = 1780 + rnd(n + 1) * 160; home = 960 + rnd(n + 2) * 120; }
+      else if (t < 86) { const k = Math.min(1, (t - 64) / 12); rps = 430; ck = 1800 - k * 1560; home = 980 - k * 760; }
+      else { rps = 425 + rnd(n) * 10; ck = 225 + rnd(n + 3) * 40; home = 180 + rnd(n + 4) * 30; }
+      ck += (rnd(n + 7) - 0.5) * 40; home += (rnd(n + 9) - 0.5) * 24;
+      return { rps, ck: Math.max(80, ck), home: Math.max(60, home) };
+    }
+    const base = Date.now();
+    const iso = (sec) => new Date(start + sec * 1000).toISOString();
+    const at0 = Number(qs.get("at")) || 0;
+    for (let i = 120; i > 0; i--) {
+      const tt = at0 - i, s = tt < 0 ? sample(0, i) : sample(tt % CYCLE, Math.floor(tt));
+      hist.push({ ts: new Date(base - i * 1000).toISOString(), p95_ms: { "/checkout": s.ck * (tt < 0 ? 0.95 : 1), "/": s.home }, rps: s.rps * (tt < 0 ? 0.9 : 1) });
+    }
+    let frozenAt = null;
+    function tick() {
+      let elapsed = (Date.now() - start) / 1000;
+      if (freeze) { if (frozenAt === null) frozenAt = elapsed; elapsed = frozenAt; }
+      const t = elapsed % CYCLE;
+      const cycleStart = elapsed - t;
+      const s = sample(t, Math.floor(elapsed));
+      if (!freeze || hist.length < 121) hist.push({ ts: new Date().toISOString(), p95_ms: { "/checkout": s.ck, "/": s.home }, rps: s.rps });
+      while (hist.length > 180) hist.shift();
+      const breachCount = t >= 39 && t < 76 ? Math.min(3, Math.floor((t - 39) / 2.3) + 1) : 0;
+      const shed = t >= 63;
+      const firing = t >= 46 && t < 86;
+      const resolved = t >= 86;
+      const T = (sec) => iso(cycleStart + sec);
+      const feed = [{ ts: T(0), source: "guardian", text: "Guard armed for Diwali sale · watching /checkout and / every 5 s" }];
+      const tasks = [];
+      if (t >= 46) {
+        feed.push({ ts: T(46), source: "guardian", text: "Checkout p95 1840 ms breaches 800 ms SLO 3× at 430 rps → event sent to NudgeBee" });
+        feed.push({ ts: T(47), source: "nudgebee", text: "Event received · AI RCA started on Deployment store/store-api" });
+      }
+      if (t >= 52) {
+        feed.push({ ts: T(52), source: "nudgebee", text: "RCA: CPU saturation on store-api (1 pod) from recommendations; suggest shed_heavy_features (+62% capacity)" });
+        tasks.push({ id: "t1", type: "llm.classify", status: "COMPLETED", detail: "→ shed_heavy_features" });
+        tasks.push({ id: "t2", type: "http", name: "Ask founder on WhatsApp", status: "COMPLETED", detail: "POST ops-bot /nb/approval-request" });
+        tasks.push({ id: "t3", type: "core.approval", status: t >= 61 ? "COMPLETED" : "WAITING", detail: t >= 61 ? "approved by voice · \"haan karo\" (hi-IN 0.97)" : "" });
+      }
+      if (t >= 54) feed.push({ ts: T(54), source: "ops-bot", text: "Hindi voice note sent to Ravi with Approve / Reject" });
+      if (t >= 61) feed.push({ ts: T(61), source: "ops-bot", text: "Ravi approved by voice: \"haan karo\" (hi-IN, 0.97)" });
+      if (t >= 61) tasks.push({ id: "t4", type: "http", name: "Flagsmith: heavy_features OFF", status: t >= 63 ? "COMPLETED" : "RUNNING", detail: "PATCH featurestates" });
+      if (t >= 63) {
+        feed.push({ ts: T(63), source: "flagsmith", text: "heavy_features turned OFF by NudgeBee (approved by Ravi) · high_value_cart keeps full experience" });
+        tasks.push({ id: "t5", type: "k8s.horizontal_rightsize", status: t >= 72 ? "COMPLETED" : "RUNNING", detail: "store-api 1 → 3" });
+      }
+      if (t >= 72) feed.push({ ts: T(72), source: "nudgebee", text: "Scaled store-api 1 → 3 replicas" });
+      if (t >= 86) {
+        feed.push({ ts: T(86), source: "guardian", text: "Checkout p95 back to 230 ms for 3 samples → incident resolved" });
+        tasks.push({ id: "t6", type: "http", name: "Tell Ravi: sab theek hai", status: "COMPLETED", detail: "POST ops-bot /nb/notify" });
+        feed.push({ ts: T(87), source: "ops-bot", text: "\"Sab theek hai\" voice note sent · p95 1840 → 230 ms" });
+      }
+      const state = {
+        armed: true,
+        slo: {
+          "/checkout": { p95_ms: s.ck, error_rate: firing && !shed ? 0.031 : 0.002, target_p95_ms: 800, breaching: s.ck > 800, breach_count: breachCount },
+          "/": { p95_ms: s.home, error_rate: 0.001, target_p95_ms: 1200, breaching: s.home > 1200, breach_count: 0 },
+        },
+        rps: s.rps,
+        replicas: { "store-api": t >= 72 ? 3 : 1 },
+        db: { primary: { route: "db:primary", in_use: t >= 72 ? 3 * 2 : Math.min(5, Math.round(s.rps / 90)), size: t >= 72 ? 15 : 5,
+                         utilisation: t >= 72 ? 0.4 : Math.min(1, Math.round(s.rps / 90) / 5), wait_p95_s: firing && !shed ? 0.18 : 0.004,
+                         target_utilisation: 0.9, target_wait_p95_s: 0.25, breaching: false, breach_count: 0 },
+              replica: null, read_from_replica: false },
+        flags: {},
+        incident: firing ? { id: "slo-checkout-p95-" + Math.floor((start + (cycleStart + 46) * 1000) / 1000), status: "firing", since: T(46) }
+          : resolved ? { id: "slo-checkout-p95-" + Math.floor((start + (cycleStart + 46) * 1000) / 1000), status: "resolved", since: T(46), resolved_at: T(86) } : null,
+        last_execution: t >= 52 ? { workflow: "sale-incident-guard", execution_id: "exec-7f3a9c21-diwali", status: t >= 86 ? "COMPLETED" : t >= 61 ? "RUNNING" : "WAITING", start_time: T(52), tasks } : null,
+        history: hist.slice(),
+        feed,
+      };
+      const flags = { heavy_features: !shed, recommendations: !shed, hd_images: !shed, live_reviews: !shed, festive_collection: false, checkout_flow: "full", payment_gateway: "razorpay", source: "flagsmith" };
+      const orders = Math.floor(elapsed * 3);
+      const experiment = { full: { exposures: 400 + orders, conversions: Math.floor((400 + orders) * 0.61), conversion_rate: 0.61 }, lite: { exposures: 396 + orders, conversions: Math.floor((396 + orders) * 0.68), conversion_rate: 0.68 } };
+      if (ff.data && ff.data.source === "demo" && ff.demoShed !== shed) {
+        ff.demoShed = shed;
+        ff.data.flags.forEach((f) => { if (f.name === "heavy_features") f.enabled = !shed; });
+        renderFlagPanel(true);
+      }
+      render({ guardian_online: true, guardian_url: "demo", state, store: { flags, experiment, pod: "store-api-demo" } });
+    }
+    tick();
+    setInterval(tick, 1000);
+  }
+
+  // ---------------------------------------------------------------- feature flag toggles (POST /ops/flags/{name})
+  const PASS_KEY = "fk_ops_passcode";
+  const GROUP_ORDER = ["Load shedding", "Checkout", "Database", "AI agent", "Founder voice", "Other"];
+  const ALERT_WHEN_OFF = new Set(["heavy_features", "recommendations", "hd_images", "live_reviews", "ai_agent"]);
+  const ff = { data: null, busy: new Set(), sig: "", prev: {}, demoShed: null };
+  const passStore = {
+    get() { try { return localStorage.getItem(PASS_KEY); } catch (e) { return null; } },
+    set(v) { try { localStorage.setItem(PASS_KEY, v); } catch (e) { /* private mode */ } },
+    clear() { try { localStorage.removeItem(PASS_KEY); } catch (e) { /* private mode */ } },
+  };
+  let toastTimer = null;
+  function toast(msg, err) {
+    const t = $("toast");
+    t.textContent = msg; t.className = "toast show" + (err ? " err" : "");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { t.className = "toast" + (err ? " err" : ""); }, err ? 5000 : 3800);
+  }
+
+  function demoFlags() {
+    const f = (name, group, enabled, extra) => Object.assign({ name, group, enabled, value: null, kind: "flag", description: "", parent: null, is_parent: false, masked: false }, extra || {});
+    return {
+      source: "demo", writable: true, refresh_seconds: 5, groups: GROUP_ORDER,
+      flags: [
+        f("heavy_features", "Load shedding", true, { is_parent: true, description: "Parent switch. Off = shed every heavy feature at once (flag dependency parent)." }),
+        f("recommendations", "Load shedding", true, { parent: "heavy_features", description: "Personalised recommendations on home and product pages (CPU-heavy)." }),
+        f("hd_images", "Load shedding", true, { parent: "heavy_features", description: "On-the-fly HD image resizing." }),
+        f("live_reviews", "Load shedding", true, { parent: "heavy_features", description: "Live review aggregation (otherwise cached)." }),
+        f("payment_gateway", "Checkout", true, { kind: "config", value: "razorpay", options: ["razorpay", "cashfree"], description: "Remote config. razorpay | cashfree (both mocked). Failover target for NudgeBee." }),
+        f("checkout_flow", "Checkout", true, { kind: "config", value: "full", description: "A/B test. Does lite checkout convert better under festive load? Metric order_placed." }),
+        f("read_from_replica", "Database", false, { description: "Send catalogue reads to the read replica in db_read_url (writes always go to the primary)." }),
+        f("db_pool", "Database", true, { kind: "config", value: '{"pool_size":5,"max_overflow":0,"timeout_s":2}', description: "Remote config JSON for the store's DB connection pool. The store resizes its pool live (<=5 s)." }),
+        f("db_read_url", "Database", true, { kind: "config", value: "postgresql://insidious:***@insidious-replica.demo:5432/jeffy", masked: true, description: "Remote config. SQLAlchemy URL of the read replica; set by the agent once an RDS replica is available." }),
+        f("ai_agent", "AI agent", true, { description: "AI kill switch. Off = the agent only notifies the founder and never proposes or runs plans." }),
+        f("agent_config", "AI agent", true, { kind: "config", value: '{"provider":"anthropic","model":"claude-sonnet-5-5","autopilot":false,"max_actions":4}', description: "Remote config JSON for the Claude ops agent (provider, model, autopilot, max actions per plan)." }),
+        f("ops_voice", "Founder voice", true, { kind: "config", value: '{"speaker": "", "pace": 1.25, "language": "ta-IN", "style": "tanglish"}', description: "Remote config JSON for the founder's ops voice notes (Sarvam Bulbul speaker, pace, language)." }),
+        f("festive_collection", "Other", false, { description: "Progressive rollout of the festive collection (percentage split segment)." }),
+      ],
+    };
+  }
+
+  function flagRow(fl, parentOff, writable) {
+    const busy = ff.busy.has(fl.name);
+    const shed = fl.parent && parentOff && fl.enabled;
+    const cls = ["ff-row", fl.enabled ? "on" : "off", ALERT_WHEN_OFF.has(fl.name) ? "alert" : "", fl.is_parent ? "parent" : "", fl.parent ? "child" : "", shed ? "shed" : "",
+      fl.name in ff.prev && ff.prev[fl.name] !== fl.enabled + "|" + fl.value ? "flash" : ""].filter(Boolean).join(" ");
+    const state = shed ? "Shed" : fl.enabled ? "On" : "Off";
+    let desc = fl.description || "";
+    if (fl.is_parent) desc = "Turns off all heavy features (recommendations, hd_images, live_reviews). " + desc.replace(/^Parent switch\.\s*/i, "");
+    if (shed) desc = "Shed: parent heavy_features is off. " + desc;
+    let val = "";
+    if (fl.kind === "config") {
+      if (fl.options && fl.options.length) {
+        const opts = fl.options.map((o) => `<option value="${esc(o)}"${o === fl.value ? " selected" : ""}>${esc(o)}</option>`).join("");
+        const extra = fl.options.includes(fl.value) ? "" : `<option value="" selected disabled>${esc(fl.value || "—")}</option>`;
+        val = `<div class="vl"><span>value</span><select class="ff-sel" data-flag="${esc(fl.name)}" aria-label="${esc(fl.name)} value"${busy || !writable ? " disabled" : ""}>${extra}${opts}</select></div>`;
+      } else {
+        const shown = fl.value == null || fl.value === "" ? "(empty)" : String(fl.value);
+        val = `<div class="vl"><span>value</span><code class="ff-val${fl.masked ? " masked" : ""}" title="${esc(shown)}">${esc(shown)}</code></div>`;
+      }
+    }
+    const badge = fl.is_parent ? '<span class="ff-badge">parent</span>' : "";
+    const tip = writable ? `Turn ${esc(fl.name)} ${fl.enabled ? "off" : "on"}` : "Read-only: Flagsmith Admin API or passcode not configured";
+    return `<div class="${cls}" data-row="${esc(fl.name)}"><div style="min-width:0"><div class="nm">${esc(fl.name)}${badge}</div>` +
+      (desc ? `<div class="ds" title="${esc(desc)}">${esc(desc)}</div>` : "") + val + `</div>` +
+      `<div class="ctl"><span class="stt">${state}</span><button type="button" class="sw${busy ? " busy" : ""}" role="switch" aria-checked="${fl.enabled ? "true" : "false"}" ` +
+      `aria-label="${esc(fl.name)}" title="${tip}" data-flag="${esc(fl.name)}"${busy || !writable ? " disabled" : ""}></button></div></div>`;
+  }
+
+  function renderFlagPanel(force) {
+    const d = ff.data;
+    if (!d) return;
+    const sel = document.activeElement;
+    if (!force && sel && sel.classList && sel.classList.contains("ff-sel")) return; // don't close an open select
+    const sig = JSON.stringify([d.flags, d.writable, d.source, Array.from(ff.busy)]);
+    if (!force && sig === ff.sig) return;
+    ff.sig = sig;
+    const focusedFlag = sel && sel.dataset && sel.dataset.flag && sel.classList.contains("sw") ? sel.dataset.flag : null;
+    const flags = d.flags || [];
+    const parent = flags.find((f) => f.is_parent);
+    const parentOff = parent ? !parent.enabled : false;
+    const order = (d.groups && d.groups.length ? d.groups : GROUP_ORDER);
+    const groups = {};
+    flags.forEach((f) => { (groups[f.group || "Other"] = groups[f.group || "Other"] || []).push(f); });
+    const names = order.filter((g) => groups[g]).concat(Object.keys(groups).filter((g) => !order.includes(g)));
+    $("ff-grid").innerHTML = names.map((g) => {
+      const rows = groups[g];
+      const on = rows.filter((r) => r.enabled && !(r.parent && parentOff)).length;
+      return `<div class="ff-group" role="group" aria-label="${esc(g)}"><h3><span>${esc(g)}</span><span>${on}/${rows.length} on</span></h3>${rows.map((r) => flagRow(r, parentOff, d.writable)).join("")}</div>`;
+    }).join("") || '<div class="empty">No flags reported.</div>';
+    if (focusedFlag) { const b = $("ff-grid").querySelector(`button.sw[data-flag="${CSS.escape(focusedFlag)}"]`); if (b && !b.disabled) b.focus(); }
+    const src = d.source === "flagsmith" ? "Admin API · live" : d.source === "demo" ? "demo data" : "this pod · read-only";
+    $("ff-src").innerHTML = `<b>${esc(src)}</b>` + (d.writable ? '<span class="hint"> · toggle to change</span>' : "");
+    const note = $("ff-note");
+    note.className = "ff-note";
+    note.textContent = d.note || (d.writable ? "" : "Read-only: set FLAGSMITH_ORG_API_KEY, FLAGSMITH_ENVIRONMENT_KEY and INSIDIOUS_OPS_PASSCODE on store-api to change flags here.");
+    ff.prev = {};
+    flags.forEach((f) => { ff.prev[f.name] = f.enabled + "|" + f.value; });
+  }
+
+  async function loadFlags() {
+    if (DEMO) return;
+    try {
+      const r = await fetch("/ops/flags", { cache: "no-store" });
+      const body = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(body.detail || body.error || "HTTP " + r.status);
+      ff.data = body;
+      renderFlagPanel(false);
+    } catch (e) {
+      const note = $("ff-note");
+      note.className = "ff-note err";
+      note.textContent = "Cannot read flags from Flagsmith: " + (e.message || e) + (ff.data ? " · showing last known state" : "");
+      if (!ff.data) { $("ff-grid").innerHTML = '<div class="empty">Flags unavailable.</div>'; $("ff-src").textContent = "offline"; }
+    }
+  }
+
+  async function changeFlag(name, change) {
+    const fl = ((ff.data && ff.data.flags) || []).find((f) => f.name === name);
+    if (!fl || ff.busy.has(name)) return;
+    const secs = Math.round((ff.data && ff.data.refresh_seconds) || 5);
+    const what = change.value != null ? `${name} → ${change.value}` : `${name} ${change.enabled ? "on" : "off"}`;
+    if (DEMO) {
+      Object.assign(fl, change.value != null ? { value: change.value } : { enabled: change.enabled });
+      renderFlagPanel(true);
+      toast(`${what} via Flagsmith · store picks it up in ~${secs} s (demo)`);
+      return;
+    }
+    let pass = passStore.get();
+    if (!pass) {
+      pass = window.prompt("Ops passcode to change Flagsmith flags:");
+      if (!pass) { renderFlagPanel(true); return; }
+      passStore.set(pass);
+    }
+    ff.busy.add(name); renderFlagPanel(true);
+    try {
+      const r = await fetch("/ops/flags/" + encodeURIComponent(name), {
+        method: "POST", cache: "no-store",
+        headers: { "Content-Type": "application/json", "X-Ops-Passcode": pass },
+        body: JSON.stringify(change),
+      });
+      const body = await r.json().catch(() => ({}));
+      if (r.status === 401) { passStore.clear(); toast("Wrong passcode · toggle again to re-enter it", true); return; }
+      if (!r.ok) { toast((body.detail || body.error || "HTTP " + r.status), true); return; }
+      if (body.flag) Object.assign(fl, body.flag);
+      toast(`${what} via Flagsmith · store picks it up in ~${Math.round(body.refresh_seconds || secs)} s`);
+    } catch (e) {
+      toast("Could not reach the store: " + (e.message || e), true);
+    } finally {
+      ff.busy.delete(name);
+      renderFlagPanel(true);
+      loadFlags();
+    }
+  }
+
+  $("ff-grid").addEventListener("click", (ev) => {
+    const btn = ev.target.closest("button.sw");
+    if (!btn || btn.disabled) return;
+    changeFlag(btn.dataset.flag, { enabled: btn.getAttribute("aria-checked") !== "true" });
+  });
+  $("ff-grid").addEventListener("change", (ev) => {
+    const s = ev.target.closest("select.ff-sel");
+    if (!s || !s.value) return;
+    s.blur();
+    changeFlag(s.dataset.flag, { value: s.value });
+  });
+
+  if (DEMO) { ff.data = demoFlags(); renderFlagPanel(true); } else { loadFlags(); setInterval(loadFlags, 5000); }
+
+  if (DEMO) demo(); else { poll(); setInterval(poll, 1000); }
+})();
+</script>
+</body>
+</html>

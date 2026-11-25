@@ -1,0 +1,90 @@
+# guardian: SLO watcher. Every 5 s runs PromQL against the Insidious Prometheus, fires/resolves the
+# NudgeBee Event Webhook, serves /api/state for the cockpit. Reads store-api replicas via the k8s API
+# (service account `guardian`, see rbac.yaml).
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: guardian
+  namespace: insidious
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: guardian
+  namespace: insidious
+  labels:
+    app: guardian
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: guardian
+  template:
+    metadata:
+      labels:
+        app: guardian
+    spec:
+      serviceAccountName: guardian
+      containers:
+        - name: guardian
+          image: insidious/guardian:dev
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8002
+          envFrom:
+            - secretRef:
+                name: insidious-env
+                optional: true
+          env:
+            - name: INSIDIOUS_CONFIG
+              value: /config/insidious.yaml
+            - name: INSIDIOUS_FLAGS
+              value: /config/flags.yaml
+            - name: STORE_URL
+              value: http://store-api.store.svc.cluster.local:8000
+            - name: PAYMENTS_URL
+              value: http://payments-mock.store.svc.cluster.local:8001
+            - name: GUARDIAN_URL
+              value: http://guardian.insidious.svc.cluster.local:8002
+            - name: OPS_BOT_URL
+              value: http://ops-bot.insidious.svc.cluster.local:8003
+            - name: PROMETHEUS_URL
+              value: http://prometheus.insidious.svc.cluster.local:9090
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 2
+            periodSeconds: 5
+            failureThreshold: 6
+          volumeMounts:
+            - name: config
+              mountPath: /config
+              readOnly: true
+      volumes:
+        - name: config
+          configMap:
+            name: insidious-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: guardian
+  namespace: insidious
+  labels:
+    app: guardian
+spec:
+  selector:
+    app: guardian
+  ports:
+    - name: http
+      port: 8002
+      targetPort: http

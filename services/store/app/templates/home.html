@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% from "_macros.html" import product_card, rec_head %}
+{% block style %}
+.hero{position:relative;overflow:hidden;background:
+  radial-gradient(600px 300px at 85% 30%,rgba(244,163,0,.22),transparent 70%),
+  radial-gradient(500px 260px at 10% 90%,rgba(224,86,127,.14),transparent 70%),var(--cream)}
+.hero .wrap{display:grid;grid-template-columns:1.05fr .95fr;gap:36px;align-items:center;padding-top:46px;padding-bottom:40px}
+.hero h1{font-size:54px;line-height:1.05;margin:12px 0 16px}
+.hero h1 em{font-style:normal;color:var(--saffron)}
+.hero p.lead{font-size:17px;color:var(--muted);max-width:520px;margin:0 0 26px}
+.hero .ctas{display:flex;gap:12px;flex-wrap:wrap}
+.hero .trust{display:flex;gap:22px;margin-top:28px;color:var(--maroon);font-size:13px;font-weight:600;flex-wrap:wrap}
+.hero .trust span{display:inline-flex;align-items:center;gap:7px}
+.hero .trust svg{width:18px;height:18px;color:var(--gold)}
+.arch{position:relative;border-radius:240px 240px 26px 26px;background:linear-gradient(180deg,#fff,#fff3dd);padding:18px;
+  box-shadow:0 30px 60px rgba(91,14,45,.18);border:2px solid var(--gold-2)}
+.arch::before{content:"";position:absolute;inset:8px;border-radius:232px 232px 20px 20px;border:1.5px dashed rgba(201,150,43,.6);pointer-events:none}
+.arch .art{border-radius:220px 220px 16px 16px;overflow:hidden}
+.arch .price-tag{position:absolute;right:-12px;bottom:34px;background:var(--maroon);color:#fff;border-radius:16px;padding:12px 16px;
+  box-shadow:0 12px 24px rgba(91,14,45,.3);font-size:13px}
+.arch .price-tag b{display:block;font-size:20px;color:var(--gold-2);font-family:"Yeseva One",serif;font-weight:400}
+.diya-row{position:absolute;left:0;right:0;bottom:0;height:10px;background:repeating-linear-gradient(90deg,var(--marigold) 0 14px,transparent 14px 28px);opacity:.5}
+.collection{margin-top:28px;border-radius:var(--radius);padding:22px 26px;color:#fff;display:flex;justify-content:space-between;align-items:center;gap:16px;
+  background:linear-gradient(110deg,var(--emerald),#127a66 60%,#1b9c83)}
+.collection h3{color:#fff;font-size:24px}
+.strip{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:8px}
+.strip div{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px;font-size:13px;color:var(--muted)}
+.strip b{display:block;color:var(--maroon-3);font-size:15px}
+@media (max-width:980px){.hero .wrap{grid-template-columns:1fr}.hero h1{font-size:40px}.strip{grid-template-columns:1fr 1fr}}
+{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="wrap">
+    <div>
+      <span class="pill">The Diwali Edit 2026 · {{ products|length }} handcrafted styles</span>
+      <h1>Walk into every <em>celebration</em> like royalty.</h1>
+      <p class="lead">Juttis and mojaris hand-stitched by Jaipur karigars: zardozi, mirror work and phulkari on soft, cushioned soles you can dance in till the last baraat.</p>
+      <div class="ctas">
+        <a class="btn btn-primary" href="#shop">Shop the Diwali Edit</a>
+        <a class="btn btn-ghost" href="/product/7">Bridal collection</a>
+      </div>
+      <div class="trust">
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z"/></svg>4.7 from 11,200+ reviews</span>
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7h13v10H3zM16 10h4l1 3v4h-5"/><circle cx="7" cy="18" r="2"/><circle cx="18" cy="18" r="2"/></svg>Delivered before Diwali</span>
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12a8 8 0 1 0 3-6.2M4 4v4h4"/></svg>7-day size exchange</span>
+      </div>
+    </div>
+    <div class="arch">
+      <div class="art">{{ hero_svg|safe }}</div>
+      <div class="price-tag">{{ hero.name }}<b>{{ hero.price|inr }}</b></div>
+    </div>
+  </div>
+  <div class="diya-row" aria-hidden="true"></div>
+</section>
+
+<div class="wrap">
+  {% if live.festive_collection %}
+  <div class="collection">
+    <div><div class="eyebrow" style="color:#ffe08a">Just dropped · early access</div><h3>The Sheesh Mahal Festive Collection</h3></div>
+    <a class="btn btn-gold" href="/product/3">Explore</a>
+  </div>
+  {% endif %}
+
+  <section class="section" id="shop">
+    <div class="section-head">
+      <div><div class="eyebrow">Shop the collection</div><h2>Festive juttis, made in Jaipur</h2></div>
+      <span class="pill {{ 'live' if hd else 'cached' }}"><span class="dot"></span>{{ 'HD artwork' if hd else 'Standard images' }}</span>
+    </div>
+    <div class="grid">
+      {% for p in products %}{{ product_card(p, images[p.id]) }}{% endfor %}
+    </div>
+  </section>
+
+  <section class="section">
+    {{ rec_head(rec_source, 'Picked for you this Diwali', 'Bestsellers this Diwali') }}
+    <div class="grid">
+      {% for p in recs %}{{ product_card(p, images[p.id]) }}{% endfor %}
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="strip">
+      <div><b>Handmade in Jaipur</b>Every pair stitched by our 12 karigars</div>
+      <div><b>Cushioned comfort</b>Double-padded sole, no shoe bite</div>
+      <div><b>Free shipping</b>On orders above ₹1,999</div>
+      <div><b>Easy exchange</b>7 days, doorstep pickup</div>
+    </div>
+  </section>
+</div>
+{% endblock %}

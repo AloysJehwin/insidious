@@ -1,0 +1,33 @@
+# Insidious on k3s (EC2 in ap-south-1). Same manifests as deploy/k8s, plus:
+#  - Ingress class -> traefik (k3s ships Traefik; ServiceLB binds :80/:443 on the node)
+#  - HEAVY_WORK_MS tuned so one store pod breaks at a demo-friendly load
+# Apply with an explicit kubeconfig/context, never the default one:
+#   kubectl --kubeconfig ~/.kube/festivekit-k3s.yaml --context festivekit-k3s apply -k deploy/k3s
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../k8s
+patches:
+  - target:
+      kind: Ingress
+    patch: |-
+      - op: replace
+        path: /spec/ingressClassName
+        value: traefik
+  - target:
+      kind: Deployment
+      name: store-api
+    patch: |-
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: store-api
+        namespace: store
+      spec:
+        template:
+          spec:
+            containers:
+              - name: store-api
+                env:
+                  - name: HEAVY_WORK_MS
+                    value: "8"

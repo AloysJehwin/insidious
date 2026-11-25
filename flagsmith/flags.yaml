@@ -1,0 +1,81 @@
+# Desired Flagsmith state for the Jeffy store. `insidious init` creates or updates these idempotently
+# through the Admin API (organisation API key). Do NOT enable Feature Versioning v2 on the environment:
+# it is irreversible and breaks the featurestate write endpoints this file relies on.
+features:
+  - name: heavy_features
+    type: FLAG
+    default_enabled: true
+    description: Parent switch. Off = shed every heavy feature at once (flag dependency parent).
+  - name: recommendations
+    type: FLAG
+    default_enabled: true
+    depends_on: heavy_features
+    description: Personalised recommendations on home and product pages (CPU-heavy).
+  - name: hd_images
+    type: FLAG
+    default_enabled: true
+    depends_on: heavy_features
+    description: On-the-fly HD image resizing.
+  - name: live_reviews
+    type: FLAG
+    default_enabled: true
+    depends_on: heavy_features
+    description: Live review aggregation (otherwise cached).
+  - name: checkout_flow
+    type: MULTIVARIATE
+    default_enabled: true
+    default_value: full
+    variants:
+      - value: full
+        percentage: 50
+      - value: lite
+        percentage: 50
+    description: A/B test. Does lite checkout convert better under festive load? Metric order_placed.
+  - name: payment_gateway
+    type: CONFIG
+    default_enabled: true
+    default_value: razorpay
+    description: Remote config. razorpay | cashfree (both mocked). Failover target for NudgeBee.
+  - name: ops_voice
+    type: CONFIG
+    default_enabled: true
+    default_value: '{"speaker": "", "pace": 1.25, "language": "ta-IN", "style": "tanglish"}'
+    description: Remote config JSON for the founder's ops voice notes (Sarvam Bulbul speaker, pace, language).
+  - name: festive_collection
+    type: FLAG
+    default_enabled: false
+    description: Progressive rollout of the festive collection (percentage split segment).
+  - name: read_from_replica
+    type: FLAG
+    default_enabled: false
+    description: Send catalogue reads to the read replica in db_read_url (writes always go to the primary).
+  - name: db_read_url
+    type: CONFIG
+    default_enabled: true
+    default_value: ""
+    description: Remote config. SQLAlchemy URL of the read replica; set by the agent once an RDS replica is available.
+  - name: db_pool
+    type: CONFIG
+    default_enabled: true
+    default_value: '{"pool_size":5,"max_overflow":0,"timeout_s":2}'
+    description: Remote config JSON for the store's DB connection pool. The store resizes its pool live (<=5 s).
+  - name: agent_config
+    type: CONFIG
+    default_enabled: true
+    default_value: '{"provider":"anthropic","model":"claude-sonnet-5-5","autopilot":false,"max_actions":4}'
+    description: Remote config JSON for the Claude ops agent (provider, model, autopilot, max actions per plan).
+  - name: ai_agent
+    type: FLAG
+    default_enabled: true
+    description: AI kill switch. Off = the agent only notifies the founder and never proposes or runs plans.
+
+segments:
+- name: high_value_cart
+  description: Big carts keep the full experience while everyone else is shed.
+  rules:
+  - property: cart_value
+    operator: GREATER_THAN
+    value: '2000'
+  overrides:
+  - feature: heavy_features
+    enabled: true

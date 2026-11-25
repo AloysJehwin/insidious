@@ -1,0 +1,59 @@
+# agent (ns insidious) may read and change the store: scale and resize Deployments in ns store, read pods and
+# their logs, and read pod metrics (metrics.k8s.io). Nothing outside ns store; guardrails in insidious.yaml
+# (agent.guardrails.allowed_namespaces) are enforced in code as well.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: insidious-agent
+  namespace: store
+rules:
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get", "list", "watch", "patch"]
+  - apiGroups: ["apps"]
+    resources: ["deployments/scale"]
+    verbs: ["get", "patch", "update"]
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list"]
+  - apiGroups: [""]
+    resources: ["pods/log"]
+    verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: insidious-agent
+  namespace: store
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: insidious-agent
+subjects:
+  - kind: ServiceAccount
+    name: agent
+    namespace: insidious
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: insidious-agent-metrics
+rules:
+  - apiGroups: ["metrics.k8s.io"]
+    resources: ["pods"]
+    verbs: ["get", "list"]
+---
+# Bound with a RoleBinding (not a ClusterRoleBinding) so the agent reads pod metrics in ns store only.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: insidious-agent-metrics
+  namespace: store
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: insidious-agent-metrics
+subjects:
+  - kind: ServiceAccount
+    name: agent
+    namespace: insidious

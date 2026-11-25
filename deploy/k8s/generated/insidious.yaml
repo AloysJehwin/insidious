@@ -1,0 +1,72 @@
+# Insidious config for the Jeffy store. Written by `insidious init`, read by guardian, CLI and ops-bot.
+app:
+  name: jeffy
+  namespace: store
+  deployment: store-api
+  url: http://store-api:8000
+
+founder:
+  name: Ravi
+  phone_env: FOUNDER_PHONE        # read the number from this env var
+  language: hi-IN
+
+# Service-level objectives guardian enforces. Windows are short on purpose for a live demo.
+slos:
+  - route: /checkout
+    p95_ms: 800
+    error_rate: 0.02
+  - route: /
+    p95_ms: 1200
+    error_rate: 0.05
+guardian:
+  interval_seconds: 5
+  breach_samples: 3       # consecutive breaching samples before firing
+  recover_samples: 3      # consecutive healthy samples before resolving
+  rate_window: 30s        # PromQL rate() window
+
+# Features the SDK may shed under load. The parent flag sheds all children at once.
+degradable:
+  parent_flag: heavy_features
+  features:
+    - flag: recommendations
+      fallback: cached_top_sellers
+    - flag: hd_images
+      fallback: low_res_images
+    - flag: live_reviews
+      fallback: cached_reviews
+
+# Load rehearsal profile
+rehearse:
+  start_rps: 40
+  max_rps: 480
+  step_rps: 40
+  step_seconds: 20
+
+nudgebee:
+  rule_name: insidious-slo
+  workflows:
+    presale_env: NUDGEBEE_WF_PRESALE_ID
+    incident_env: NUDGEBEE_WF_INCIDENT_ID
+    postsale_env: NUDGEBEE_WF_POSTSALE_ID
+  scale:
+    normal_replicas: 1
+    sale_replicas: 3
+
+# Database the store runs on (SDK insidious.db). guardian fires an insidious-db incident (route key db:primary)
+# when pool utilisation or connection wait p95 breaches for breach_samples in a row.
+database:
+  engine: postgresql
+  rds_id_env: DATABASE_RDS_ID      # RDS instance id of the primary (read from this env var)
+  slo:
+    pool_utilisation: 0.9          # sum(in_use) / sum(size) on db="primary"
+    wait_p95_s: 0.25               # p95 seconds a request waits for a pooled connection
+
+# Claude ops agent. It may only propose actions inside these guardrails; executors reject anything else.
+agent:
+  guardrails:
+    max_replicas: 5
+    allowed_namespaces: [store]
+    allowed_db_instance_classes: [db.t4g.micro, db.t4g.small, db.t4g.medium]
+    max_memory_limit: 2Gi
+    max_cpu_limit: "2"
+    rds_id_prefix: [insidious-, festivekit-]   # festivekit-* = existing RDS (festivekit-primary, replicas)

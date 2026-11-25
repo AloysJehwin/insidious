@@ -1,0 +1,87 @@
+# ops-bot: WhatsApp webhook + Sarvam pipeline + NudgeBee bridge. Reached from the internet through
+# ngrok -> localhost:80 -> ingress-nginx (paths /whatsapp, /nb, /flagsmith, /api/brief, /api/pending).
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ops-bot
+  namespace: insidious
+  labels:
+    app: ops-bot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ops-bot
+  template:
+    metadata:
+      labels:
+        app: ops-bot
+    spec:
+      containers:
+        - name: ops-bot
+          image: insidious/ops-bot:dev
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8003
+          envFrom:
+            - secretRef:
+                name: insidious-env
+                optional: true
+          env:
+            - name: INSIDIOUS_CONFIG
+              value: /config/insidious.yaml
+            - name: INSIDIOUS_FLAGS
+              value: /config/flags.yaml
+            - name: STORE_URL
+              value: http://store-api.store.svc.cluster.local:8000
+            - name: PAYMENTS_URL
+              value: http://payments-mock.store.svc.cluster.local:8001
+            - name: GUARDIAN_URL
+              value: http://guardian.insidious.svc.cluster.local:8002
+            - name: OPS_BOT_URL
+              value: http://ops-bot.insidious.svc.cluster.local:8003
+            - name: PROMETHEUS_URL
+              value: http://prometheus.insidious.svc.cluster.local:9090
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: "1"
+              memory: 512Mi
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 2
+            periodSeconds: 5
+            failureThreshold: 6
+          volumeMounts:
+            - name: config
+              mountPath: /config
+              readOnly: true
+            # pending approvals, seen message ids, founder language (DATA_DIR=/data in the image)
+            - name: data
+              mountPath: /data
+      volumes:
+        - name: config
+          configMap:
+            name: insidious-config
+        - name: data
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ops-bot
+  namespace: insidious
+  labels:
+    app: ops-bot
+spec:
+  selector:
+    app: ops-bot
+  ports:
+    - name: http
+      port: 8003
+      targetPort: http

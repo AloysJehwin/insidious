@@ -1,0 +1,33 @@
+{% macro stars(rating) -%}
+<div class="stars" aria-label="{{ rating }} out of 5">{% for i in range(5) %}{{ '★' if i < rating|round(0, 'floor') else '☆' }}{% endfor %}<span>{{ rating }}</span></div>
+{%- endmacro %}
+
+{% macro product_card(p, svg, next='/cart') -%}
+<article class="card">
+  <a class="img" href="/product/{{ p.id }}" aria-label="{{ p.name }}">
+    {{ svg|safe }}
+    {% if p.badge %}<span class="badge {{ 'gold' if p.badge in ['Diwali Edit','New','Value'] else '' }}">{{ p.badge }}</span>{% endif %}
+  </a>
+  <div class="body">
+    <a class="title" href="/product/{{ p.id }}">{{ p.name }}</a>
+    <div class="tagline">{{ p.tagline }}</div>
+    {{ stars(p.rating) }}
+    <div class="price"><span class="now">{{ p.price|inr }}</span><span class="mrp">{{ p.mrp|inr }}</span><span class="off">{{ p.discount }}% off</span></div>
+    <form method="post" action="/cart/add">
+      <input type="hidden" name="product_id" value="{{ p.id }}"><input type="hidden" name="qty" value="1"><input type="hidden" name="next" value="{{ next }}">
+      <button class="btn btn-primary btn-sm btn-block" type="submit">Add to bag</button>
+    </form>
+  </div>
+</article>
+{%- endmacro %}
+
+{% macro rec_head(source, live_title, cached_title) -%}
+<div class="section-head">
+  <div>
+    <div class="eyebrow">{{ 'Personalised for you' if source == 'live' else 'Festive favourites' }}</div>
+    <h2>{{ live_title if source == 'live' else cached_title }}</h2>
+  </div>
+  {% if source == 'live' %}<span class="pill live"><span class="dot"></span>Live recommendations</span>
+  {% else %}<span class="pill cached"><span class="dot"></span>Bestsellers (festive rush mode)</span>{% endif %}
+</div>
+{%- endmacro %}

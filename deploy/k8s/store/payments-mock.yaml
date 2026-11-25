@@ -1,0 +1,81 @@
+# razorpay-mock / cashfree-mock (chaos-capable). Payments are mocked; said on camera.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payments-mock
+  namespace: store
+  labels:
+    app: payments-mock
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: payments-mock
+  template:
+    metadata:
+      labels:
+        app: payments-mock
+    spec:
+      containers:
+        - name: payments-mock
+          image: insidious/payments-mock:dev
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8001
+          envFrom:
+            - secretRef:
+                name: insidious-env
+                optional: true
+          env:
+            - name: INSIDIOUS_CONFIG
+              value: /config/insidious.yaml
+            - name: INSIDIOUS_FLAGS
+              value: /config/flags.yaml
+            - name: STORE_URL
+              value: http://store-api.store.svc.cluster.local:8000
+            - name: PAYMENTS_URL
+              value: http://payments-mock.store.svc.cluster.local:8001
+            - name: GUARDIAN_URL
+              value: http://guardian.insidious.svc.cluster.local:8002
+            - name: OPS_BOT_URL
+              value: http://ops-bot.insidious.svc.cluster.local:8003
+            - name: PROMETHEUS_URL
+              value: http://prometheus.insidious.svc.cluster.local:9090
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 2
+            periodSeconds: 5
+            failureThreshold: 6
+          volumeMounts:
+            - name: config
+              mountPath: /config
+              readOnly: true
+      volumes:
+        - name: config
+          configMap:
+            name: insidious-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: payments-mock
+  namespace: store
+  labels:
+    app: payments-mock
+spec:
+  selector:
+    app: payments-mock
+  ports:
+    - name: http
+      port: 8001
+      targetPort: http

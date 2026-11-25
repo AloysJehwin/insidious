@@ -1,0 +1,167 @@
+{
+  "enabled": true,
+  "source": "assets/live-ops",
+  "pattern": "f%04d.jpg",
+  "secondsPerFrame": 1.0,
+  "note": "Recorded 25 Nov 2026 14:45:47-14:53:47 IST from the live console at 1 fps. The founder did not tap in this take, so it is used only for the detect/business-impact beat; the fix scene is the replay built from real logs.",
+  "sections": [
+    {
+      "scene": "detect",
+      "from": "0",
+      "to": "@c4b|-0.3",
+      "label": "Live · festive.aloysjehwin.com/ops",
+      "keys": [
+        [
+          "0",
+          34
+        ],
+        [
+          "@c4a~In about",
+          60
+        ],
+        [
+          "@c4a~guardian|-0.4",
+          63
+        ],
+        [
+          "@c4a~guardian|+1.2",
+          64.6
+        ],
+        [
+          "@c4a~eight",
+          76
+        ],
+        [
+          "@c4m",
+          84
+        ],
+        [
+          "@c4m~at risk",
+          93
+        ],
+        [
+          "@c4m.end",
+          99
+        ],
+        [
+          "@c4b",
+          100
+        ]
+      ],
+      "zoom": [
+        [
+          "0",
+          1.0,
+          0.5,
+          0.5
+        ],
+        [
+          "@c4a~In about|-0.3",
+          1.0,
+          0.5,
+          0.3
+        ],
+        [
+          "@c4a~guardian|+0.1",
+          1.25,
+          0.5,
+          0.08
+        ],
+        [
+          "@c4a~Checkout is|-0.2",
+          1.25,
+          0.5,
+          0.08
+        ],
+        [
+          "@c4a~eight|+0.2",
+          1.35,
+          0.1,
+          0.2
+        ],
+        [
+          "@c4m|+0.2",
+          1.35,
+          0.1,
+          0.2
+        ],
+        [
+          "@c4m~prices|+0.9",
+          1.35,
+          0.92,
+          0.45
+        ],
+        [
+          "@c4b",
+          1.38,
+          0.92,
+          0.45
+        ]
+      ],
+      "highlights": [
+        {
+          "from": "@c4a~guardian|+0.1",
+          "to": "@c4a~eight|-0.2",
+          "rect": [
+            0.0958,
+            0.075,
+            0.8083,
+            0.062
+          ],
+          "label": "guardian fired an incident"
+        },
+        {
+          "from": "@c4a~eight|+0.3",
+          "to": "@c4m|+0.6",
+          "rect": [
+            0.0964,
+            0.1528,
+            0.161,
+            0.1176
+          ],
+          "label": "Checkout p95"
+        },
+        {
+          "from": "@c4m~prices|+1.0",
+          "to": "@c4b|-0.2",
+          "rect": [
+            0.7083,
+            0.344,
+            0.1917,
+            0.085
+          ],
+          "label": "Console estimate"
+        }
+      ],
+      "source": "assets/live-ops"
+    },
+    {
+      "scene": "fix",
+      "enabled": false,
+      "source": "assets/live-ops-take3",
+      "pattern": "f%04d.jpg",
+      "label": "Live · festive.aloysjehwin.com/ops · founder tapped 1 ⭐",
+      "from": "0",
+      "to": "@c6b|-0.3",
+      "keys": [
+        [
+          "0",
+          1
+        ],
+        [
+          "@c6a.end",
+          2
+        ]
+      ],
+      "zoom": [
+        [
+          "0",
+          1.0,
+          0.5,
+          0.5
+        ]
+      ],
+      "highlights": []
+    }
+  ]
+}

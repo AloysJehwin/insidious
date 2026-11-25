@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}Your bag · Jeffy{% endblock %}
+{% block style %}
+.cart{display:grid;grid-template-columns:1.5fr .9fr;gap:28px;padding-top:34px;align-items:start}
+.line{display:grid;grid-template-columns:120px 1fr auto;gap:16px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line)}
+.line:last-child{border-bottom:0}
+.line .thumb{border-radius:14px;overflow:hidden;background:var(--cream-2)}
+.line .name{font-weight:700;color:var(--maroon-3)}
+.qty{display:flex;align-items:center;gap:6px}
+.qty button{width:32px;height:32px;border-radius:10px;border:1.5px solid var(--line);background:#fff;font-weight:700;cursor:pointer;color:var(--maroon)}
+.qty span{min-width:22px;text-align:center;font-weight:700}
+.summary .row{display:flex;justify-content:space-between;padding:6px 0;color:#5e4852}
+.summary .total{font-size:20px;font-weight:700;color:var(--maroon-3);border-top:1px dashed var(--line);margin-top:8px;padding-top:12px}
+.royal{margin-top:14px;border-radius:14px;padding:12px 14px;font-size:13px;background:linear-gradient(110deg,#fff4d6,#ffe9b3);color:var(--maroon-3);border:1px solid var(--gold-2)}
+.royal.on{background:linear-gradient(110deg,var(--maroon),var(--maroon-2));color:#fff;border-color:var(--maroon)}
+.empty{text-align:center;padding:60px 20px}
+.empty h1{font-size:34px;margin-bottom:8px}
+@media (max-width:860px){.cart{grid-template-columns:1fr}.line{grid-template-columns:84px 1fr}.line .qty{grid-column:2}}
+{% endblock %}
+{% block content %}
+<div class="wrap">
+  {% if not lines %}
+  <div class="empty panel" style="margin-top:34px">
+    <h1>Your bag is waiting for its first jutti</h1>
+    <p class="sub">The Diwali Edit is up to 40% off. Every pair is handmade in Jaipur.</p>
+    <a class="btn btn-primary" href="/#shop" style="margin-top:12px">Start shopping</a>
+  </div>
+  {% else %}
+  <div class="cart">
+    <div class="panel">
+      <h2 style="font-size:28px;margin-bottom:6px">Your bag</h2>
+      <div class="sub">{{ cart_count }} item{{ 's' if cart_count != 1 else '' }}</div>
+      {% for l in lines %}
+      <div class="line">
+        <a class="thumb" href="/product/{{ l.product.id }}">{{ imgs[l.product.id]|safe }}</a>
+        <div>
+          <div class="name">{{ l.product.name }}</div>
+          <div class="sub">{{ l.product.tagline }}</div>
+          <div class="price"><span class="now">{{ l.subtotal|inr }}</span>{% if l.qty > 1 %}<span class="sub">({{ l.product.price|inr }} each)</span>{% endif %}</div>
+        </div>
+        <div class="qty">
+          <form method="post" action="/cart/update"><input type="hidden" name="product_id" value="{{ l.product.id }}"><input type="hidden" name="qty" value="{{ l.qty - 1 }}"><button aria-label="Decrease">−</button></form>
+          <span>{{ l.qty }}</span>
+          <form method="post" action="/cart/update"><input type="hidden" name="product_id" value="{{ l.product.id }}"><input type="hidden" name="qty" value="{{ l.qty + 1 }}"><button aria-label="Increase">+</button></form>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="panel summary">
+      <h3 style="font-size:22px;margin-bottom:10px">Order summary</h3>
+      <div class="row"><span>Subtotal</span><span>{{ total|inr }}</span></div>
+      <div class="row"><span>Shipping</span><span>{{ 'Free' if total >= 1999 else '₹99' }}</span></div>
+      <div class="row total"><span>Total</span><span>{{ (total if total >= 1999 else total + 99)|inr }}</span></div>
+      <a class="btn btn-primary btn-block" href="/checkout" style="margin-top:16px">Proceed to checkout</a>
+      {% if high_value %}
+      <div class="royal on"><b>Royal cart.</b> Orders above ₹2,000 keep the full Jeffy experience, even during the festive rush.</div>
+      {% else %}
+      <div class="royal">Add <b>{{ to_royal|inr }}</b> more for a <b>Royal cart</b>: the full experience stays on for you even at peak sale hour.</div>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

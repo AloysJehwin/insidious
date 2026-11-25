@@ -1,0 +1,145 @@
+# Insidious local dev: no cluster, no accounts. Everything runs with mocks by default.
+#
+#   make compose-up          # docker compose up -d --build
+#   open http://localhost:8000/ops
+#   make festive-rush        # or: docker compose --profile load run --rm k6
+#
+# .env is optional (env_file required: false). The mock switches below default to ON and can be
+# overridden from your shell or from .env (compose reads .env for ${VAR} interpolation), e.g.
+#   SARVAM_MOCK=0 WHATSAPP_DRY_RUN=0 docker compose up -d
+# Note: if you `cp .env.example .env`, its mock switches are 0 (real mode) -- set them to 1 for Quickstart A.
+name: insidious
+
+x-env: &common-env
+  INSIDIOUS_CONFIG: /config/insidious.yaml
+  INSIDIOUS_FLAGS: /config/flags.yaml
+  INSIDIOUS_DEV: ${INSIDIOUS_DEV:-${FESTIVEKIT_DEV:-1}}
+  SARVAM_MOCK: ${SARVAM_MOCK:-1}
+  NUDGEBEE_DRY_RUN: ${NUDGEBEE_DRY_RUN:-1}
+  WHATSAPP_DRY_RUN: ${WHATSAPP_DRY_RUN:-1}
+  STORE_URL: http://store-api:8000
+  PAYMENTS_URL: http://payments-mock:8001
+  GUARDIAN_URL: http://guardian:8002
+  OPS_BOT_URL: http://ops-bot:8003
+  PROMETHEUS_URL: http://prometheus:9090
+
+x-env-file: &env-file
+  - path: .env
+    required: false
+
+x-config-volumes: &config-volumes
+  - ./insidious.yaml:/config/insidious.yaml:ro
+  - ./flagsmith/flags.yaml:/config/flags.yaml:ro
+
+services:
+  store-api:
+    build:
+      context: .
+      dockerfile: services/store/Dockerfile
+    image: insidious/store-api:dev
+    env_file: *env-file
+    environment:
+      <<: *common-env
+      HEAVY_WORK_MS: ${HEAVY_WORK_MS:-40}
+    volumes: *config-volumes
+    ports:
+      - "8000:8000"
+    # Mimic the k8s pod: a CPU limit so one container saturates under festive-rush.
+    cpus: ${STORE_CPUS:-0.5}
+    depends_on:
+      - payments-mock
+    healthcheck: &healthcheck
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/healthz', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+
+  payments-mock:
+    build:
+      context: .
+      dockerfile: services/payments-mock/Dockerfile
+    image: insidious/payments-mock:dev
+    env_file: *env-file
+    environment: *common-env
+    volumes: *config-volumes
+    ports:
+      - "8001:8001"
+    healthcheck:
+      <<: *healthcheck
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8001/healthz', timeout=3)"]
+    restart: unless-stopped
+
+  guardian:
+    build:
+      context: .
+      dockerfile: services/guardian/Dockerfile
+    image: insidious/guardian:dev
+    env_file: *env-file
+    environment:
+      <<: *common-env
+      INSIDIOUS_REPORTS_DIR: /app/reports
+    volumes:
+      - ./insidious.yaml:/config/insidious.yaml:ro
+      - ./flagsmith/flags.yaml:/config/flags.yaml:ro
+      - ./reports:/app/reports
+    ports:
+      - "8002:8002"
+    depends_on:
+      - prometheus
+      - store-api
+    healthcheck:
+      <<: *healthcheck
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8002/healthz', timeout=3)"]
+    restart: unless-stopped
+
+  ops-bot:
+    build:
+      context: .
+      dockerfile: services/ops-bot/Dockerfile
+    image: insidious/ops-bot:dev
+    env_file: *env-file
+    environment: *common-env
+    volumes:
+      - ./insidious.yaml:/config/insidious.yaml:ro
+      - ./flagsmith/flags.yaml:/config/flags.yaml:ro
+      - opsbot-data:/data
+    ports:
+      - "8003:8003"
+    depends_on:
+      - guardian
+    healthcheck:
+      <<: *healthcheck
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8003/healthz', timeout=3)"]
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:v2.55.1
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.retention.time=12h
+      - --web.enable-lifecycle
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - "9090:9090"
+    restart: unless-stopped
+
+  # Load generator, only with `--profile load`:
+  #   docker compose --profile load run --rm k6
+  k6:
+    # loadtest/*.js target k6 v2; override with K6_TAG=latest if this tag is not on Docker Hub
+    image: grafana/k6:${K6_TAG:-2.2.0}
+    profiles: ["load"]
+    command: ["run", "/loadtest/festive-rush.js"]
+    environment:
+      STORE_URL: http://store-api:8000
+      BASE_URL: http://store-api:8000
+    volumes:
+      - ./loadtest:/loadtest:ro
+    depends_on:
+      - store-api
+
+volumes:
+  opsbot-data:

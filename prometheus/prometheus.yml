@@ -1,0 +1,12 @@
+# Prometheus for docker compose (local dev, no cluster). Scrapes store-api every 5 s as job "store-api",
+# matching the job label the kind Prometheus derives from the pod's app label.
+global:
+  scrape_interval: 5s
+  scrape_timeout: 4s
+  evaluation_interval: 5s
+
+scrape_configs:
+  - job_name: store-api
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["store-api:8000"]

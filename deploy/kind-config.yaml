@@ -1,0 +1,25 @@
+# kind cluster for Insidious: 1 control-plane + 2 workers.
+# The control-plane carries the ingress-ready label and maps host ports 80/443 so ingress-nginx
+# (kind provider manifest) is reachable at http://localhost. ngrok points at http://localhost:80.
+#
+#   make kind-up      # creates the cluster and installs ingress-nginx (context: kind-insidious)
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: insidious
+nodes:
+  - role: control-plane
+    kubeadmConfigPatches:
+      - |
+        kind: InitConfiguration
+        nodeRegistration:
+          kubeletExtraArgs:
+            node-labels: "ingress-ready=true"
+    extraPortMappings:
+      - containerPort: 80
+        hostPort: 80
+        protocol: TCP
+      - containerPort: 443
+        hostPort: 443
+        protocol: TCP
+  - role: worker
+  - role: worker

@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Order placed · Jeffy{% endblock %}
+{% block style %}
+.done{max-width:760px;margin:40px auto 0;text-align:center;position:relative;overflow:hidden}
+.done .petals{position:absolute;inset:0;pointer-events:none;background:
+  radial-gradient(circle at 8% 20%,var(--marigold) 5px,transparent 6px),radial-gradient(circle at 92% 18%,var(--saffron) 6px,transparent 7px),
+  radial-gradient(circle at 18% 78%,var(--pink) 4px,transparent 5px),radial-gradient(circle at 84% 70%,var(--marigold) 5px,transparent 6px),
+  radial-gradient(circle at 50% 8%,var(--gold-2) 4px,transparent 5px),radial-gradient(circle at 70% 88%,var(--saffron) 4px,transparent 5px)}
+.done .seal{width:76px;height:76px;border-radius:50%;margin:0 auto 14px;display:grid;place-items:center;
+  background:linear-gradient(180deg,#ffc44d,var(--marigold));box-shadow:0 10px 24px rgba(244,163,0,.4)}
+.done h1{font-size:42px}
+.meta{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:22px 0;text-align:left}
+.meta div{background:var(--cream-2);border-radius:14px;padding:12px 14px;font-size:12px;color:var(--muted)}
+.meta b{display:block;color:var(--maroon-3);font-size:15px;word-break:break-all}
+.items{text-align:left}
+.mini{display:grid;grid-template-columns:64px 1fr auto;gap:12px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.mini .t{border-radius:10px;overflow:hidden}
+@media (max-width:640px){.meta{grid-template-columns:1fr}}
+{% endblock %}
+{% block content %}
+<div class="wrap">
+  <div class="panel done">
+    <div class="petals" aria-hidden="true"></div>
+    <div class="seal"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#5b0e2d" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg></div>
+    <div class="eyebrow">Shukriya! Happy Diwali</div>
+    <h1>Your juttis are on their way</h1>
+    <p class="sub">A karigar in Jaipur is packing your order right now. Arriving by <b>{{ order.eta }}</b>.</p>
+    <div class="meta">
+      <div>Order<b>{{ order.order_id }}</b></div>
+      <div>Paid via (mock)<b>{{ order.gateway|capitalize }} · {{ order.total|inr }}</b></div>
+      <div>Checkout<b>{{ order.checkout_flow }} flow</b></div>
+    </div>
+    <div class="items">
+      {% for i in order['items'] %}
+      <div class="mini"><div class="t">{{ imgs[i.product_id]|safe }}</div><div><b>{{ i.name }}</b><div class="sub">Qty {{ i.qty }}</div></div><div>{{ i.subtotal|inr }}</div></div>
+      {% endfor %}
+    </div>
+    <a class="btn btn-primary" href="/" style="margin-top:22px">Continue shopping</a>
+  </div>
+</div>
+{% endblock %}

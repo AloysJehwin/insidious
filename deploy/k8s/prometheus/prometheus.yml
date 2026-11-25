@@ -1,0 +1,43 @@
+# Insidious's own small Prometheus (ns insidious). Keeps guardian independent of whatever
+# Prometheus the NudgeBee agent installed. Scrapes every pod in ns store/insidious that carries
+# prometheus.io/scrape: "true"; the pod's `app` label becomes the job label (store pods -> job="store-api").
+global:
+  scrape_interval: 5s
+  scrape_timeout: 4s
+  evaluation_interval: 5s
+
+scrape_configs:
+  - job_name: kubernetes-pods
+    kubernetes_sd_configs:
+      - role: pod
+        namespaces:
+          names: [store, insidious]
+    relabel_configs:
+      # keep only annotated pods
+      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+        action: keep
+        regex: "true"
+      # skip pods that are not running (e.g. terminating during rollouts)
+      - source_labels: [__meta_kubernetes_pod_phase]
+        action: drop
+        regex: (Pending|Succeeded|Failed|Unknown)
+      # metrics path from prometheus.io/path
+      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
+        action: replace
+        target_label: __metrics_path__
+        regex: (.+)
+      # port from prometheus.io/port
+      - source_labels: [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
+        action: replace
+        regex: ([^:]+)(?::\d+)?;(\d+)
+        replacement: $1:$2
+        target_label: __address__
+      # job = pod's app label (store-api pods -> job="store-api")
+      - source_labels: [__meta_kubernetes_pod_label_app]
+        action: replace
+        target_label: job
+        regex: (.+)
+      - source_labels: [__meta_kubernetes_namespace]
+        target_label: namespace
+      - source_labels: [__meta_kubernetes_pod_name]
+        target_label: pod
