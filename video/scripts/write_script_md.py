@@ -2,7 +2,7 @@
 """Write out/script.md: narration per scene with exact timings from build/timeline.json."""
 import json, os
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-cfg = json.load(open(os.path.join(ROOT, 'narration.json')))
+cfg = json.load(open(os.path.join(ROOT, os.environ.get('NARRATION', 'narration.json'))))
 tl = json.load(open(os.path.join(ROOT, 'build', 'timeline.json')))
 v = cfg['voice']
 fmt = lambda s: f"{int(s // 60)}:{s % 60:05.2f}"
@@ -22,5 +22,5 @@ for sc in tl['scenes']:
         if c.get('captionSub'): L.append(f"  - caption: {c['caption']} / {c['captionSub']}")
     L.append('')
 os.makedirs(os.path.join(ROOT, 'out'), exist_ok=True)
-open(os.path.join(ROOT, 'out', 'script.md'), 'w').write('\n'.join(L))
+open(os.path.join(ROOT, 'out', os.environ.get('SCRIPT_MD', 'script.md')), 'w').write('\n'.join(L))
 print('wrote out/script.md')

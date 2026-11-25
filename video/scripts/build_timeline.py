@@ -6,7 +6,7 @@ import numpy as np
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 B = os.path.join(ROOT, 'build')
-cfg = json.load(open(os.path.join(ROOT, 'narration.json')))
+cfg = json.load(open(os.path.join(ROOT, os.environ.get('NARRATION', 'narration.json'))))
 conf = json.load(open(os.path.join(ROOT, 'config.json')))
 FPS = conf.get('fps', 30)
 SR = 24000
@@ -55,7 +55,8 @@ def chunks(text, maxlen=62):
     return merged
 
 clips = {c['id']: c for c in cfg['clips']}
-audio = {cid: trim(load(os.path.join(B, 'audio', f'{cid}.wav'))) for cid in clips}
+AUDDIR = os.path.join(B, 'audio' + os.environ.get('NARRATION', 'narration.json').replace('narration', '').replace('.json', ''))
+audio = {cid: trim(load(os.path.join(AUDDIR, f'{cid}.wav'))) for cid in clips}
 
 t = 0.0; scenes = []; placed = {}
 for si, sc in enumerate(cfg['scenes']):

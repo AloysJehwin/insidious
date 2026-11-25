@@ -1,0 +1,157 @@
+{
+  "voice": {
+    "model": "bulbul:v4-flash",
+    "language_code": "en-IN",
+    "speaker": "deven_en_conversation",
+    "pace": 1.22
+  },
+  "clips": [
+    {
+      "id": "c1",
+      "scene": "hook",
+      "text": "Diwali sale night, eight PM. Ravi's handmade jutti store runs on his own website. Last year it froze at the worst moment, and Ravi can't read a server dashboard."
+    },
+    {
+      "id": "c4a",
+      "scene": "detect",
+      "text": "Insidious watches his store. On a real surge, in about thirty seconds, its guardian fires an incident. Checkout is crawling at nearly eight seconds.",
+      "captionText": "Insidious watches his store. On a real surge, in about thirty seconds, its guardian fires an incident. Checkout is crawling at nearly 8 seconds."
+    },
+    {
+      "id": "c4m",
+      "scene": "detect",
+      "text": "The console prices it: about five point three lakh rupees an hour at risk.",
+      "captionText": "The console prices it: ≈ ₹5,32,980 an hour at risk."
+    },
+    {
+      "id": "c4b",
+      "scene": "detect",
+      "text": "NudgeBee's AI finds the root cause, and Claude writes a plan."
+    },
+    {
+      "id": "c5a",
+      "scene": "chat",
+      "text": "Ravi asks how the shop is doing, in Tamil. He can use whatever language he thinks in: Tamil, Hindi, Tanglish or English, by voice or text. Sarvam understands, and replies in kind."
+    },
+    {
+      "id": "c5a2",
+      "scene": "chat",
+      "text": "Claude's plan arrives as a Tanglish voice note, with three buttons."
+    },
+    {
+      "id": "c5b",
+      "scene": "chat",
+      "text": "Pause extras and add servers for about eight rupees an hour, only pause extras, or do nothing. Ravi taps one.",
+      "captionText": "Pause extras and add servers for about ₹8 an hour, only pause extras, or do nothing. Ravi taps one."
+    },
+    {
+      "id": "c6a",
+      "scene": "fix",
+      "text": "One tap. Flagsmith switches off the heavy extras. Kubernetes adds a server. The database pool doubles. Checkout drops to under half a second, as NudgeBee measured."
+    },
+    {
+      "id": "c6b",
+      "scene": "fix",
+      "text": "A second approved plan added a real AWS read replica, and Flagsmith moved reads onto it."
+    },
+    {
+      "id": "c7",
+      "scene": "rca",
+      "text": "NudgeBee's own AI confirms it, independently."
+    },
+    {
+      "id": "c8",
+      "scene": "outcome",
+      "text": "So, four to eight rupees an hour protects about five lakh an hour, by the console's estimate. It pays for itself, and Ravi never opened a terminal.",
+      "captionText": "So, ₹4–8 an hour protects about ₹5 lakh an hour, by the console's estimate. It pays for itself, and Ravi never opened a terminal."
+    },
+    {
+      "id": "c9a",
+      "scene": "hood",
+      "text": "Under the hood: thirteen Flagsmith flags, from load-shedding and the database pool to an AI kill switch.",
+      "captionText": "Under the hood: 13 Flagsmith flags, from load-shedding and the database pool to an AI kill switch."
+    },
+    {
+      "id": "c9b",
+      "scene": "hood",
+      "text": "NudgeBee finds root causes, and a NuBi-built automation warms everything up."
+    },
+    {
+      "id": "c9c",
+      "scene": "hood",
+      "text": "Sarvam listens, understands, and speaks."
+    },
+    {
+      "id": "c9d",
+      "scene": "hood",
+      "text": "And insidious scan found twenty-seven flags in Jeffi's real code. All on AWS, in Mumbai.",
+      "captionText": "And insidious scan found 27 flags in Jeffi's real code. All on AWS, in Mumbai."
+    },
+    {
+      "id": "c10",
+      "scene": "close",
+      "text": "Insidious. Festive-season peace of mind, for every self-hosted store."
+    }
+  ],
+  "scenes": [
+    {
+      "id": "hook",
+      "chapter": "Sale night",
+      "lead": 1.2,
+      "tail": 0.5,
+      "jcut": 0.0
+    },
+    {
+      "id": "detect",
+      "chapter": "Live incident · detect",
+      "lead": 0.4,
+      "tail": 0.5,
+      "jcut": 0.3
+    },
+    {
+      "id": "chat",
+      "chapter": "Live incident · ask Ravi",
+      "lead": 0.5,
+      "tail": 1.2,
+      "gap": 0.35,
+      "jcut": 0.3
+    },
+    {
+      "id": "fix",
+      "chapter": "Live incident · fix",
+      "lead": 0.3,
+      "tail": 0.6,
+      "gap": 0.4,
+      "jcut": 0.3
+    },
+    {
+      "id": "rca",
+      "chapter": "Live incident · proof",
+      "lead": 0.4,
+      "tail": 1.4,
+      "jcut": 0.3
+    },
+    {
+      "id": "outcome",
+      "chapter": "The money outcome",
+      "lead": 0.4,
+      "tail": 0.8,
+      "jcut": 0.3
+    },
+    {
+      "id": "hood",
+      "chapter": "Under the hood",
+      "lead": 0.4,
+      "tail": 0.6,
+      "gap": 0.3,
+      "jcut": 0.3
+    },
+    {
+      "id": "close",
+      "chapter": "",
+      "lead": 0.6,
+      "tail": 2.2,
+      "jcut": 0.3
+    }
+  ]
+}

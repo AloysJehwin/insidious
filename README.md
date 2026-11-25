@@ -3,7 +3,7 @@
 **An on-call SRE for small D2C brands that lives in the founder's WhatsApp.** It talks Tanglish, explains incidents
 in plain words, and fixes things with Flagsmith flags, Kubernetes and the database only after the founder says yes.
 
-- **Demo video (3 min):** `<VIDEO LINK: add before submitting>`
+- **Demo video (1:51):** https://youtu.be/-w22mQeU36U  ·  also in the repo: [`video/out/insidious-demo-2min.mp4`](video/out/insidious-demo-2min.mp4)
 - **Live store:** https://festive.aloysjehwin.com · **Live ops cockpit:** https://festive.aloysjehwin.com/ops
   (read-only; flag toggles need a passcode)
 - **Repo:** `<REPO URL: add before submitting>` · Demo shot list: [docs/DEMO.md](docs/DEMO.md) · Design:

@@ -307,3 +307,6 @@ body{font-family:Inter,"Tamil Sangam MN","Apple Color Emoji",system-ui,sans-seri
 .replaychip{font-size:22px;font-weight:700;color:var(--accent);padding:8px 16px;border-radius:10px;border:1px solid rgba(255,181,71,.5);background:rgba(255,181,71,.07)}
 .feed .act{padding:12px 18px;margin-bottom:10px}
 .act span{font-size:21px}
+.feed .act{padding:8px 16px;margin-bottom:8px}
+.feed .act b{font-size:26px}
+.feed .act span{font-size:20px;margin-top:2px}

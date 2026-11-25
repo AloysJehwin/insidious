@@ -24,3 +24,4 @@ examples/jeffi-scan/
 video/final/
 video/out/*.mp4
 !video/out/insidious-demo-final.mp4
+!video/out/insidious-demo-2min.mp4

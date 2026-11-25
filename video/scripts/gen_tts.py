@@ -5,9 +5,9 @@ import base64, hashlib, json, os, subprocess, sys, time, urllib.error, urllib.re
 from dotenv import dotenv_values
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-AUD = os.path.join(ROOT, 'build', 'audio')
+AUD = os.path.join(ROOT, 'build', 'audio' + os.environ.get('NARRATION', 'narration.json').replace('narration', '').replace('.json', ''))
 os.makedirs(AUD, exist_ok=True)
-cfg = json.load(open(os.path.join(ROOT, 'narration.json')))
+cfg = json.load(open(os.path.join(ROOT, os.environ.get('NARRATION', 'narration.json'))))
 key = os.environ.get('SARVAM_API_KEY') or dotenv_values(os.path.join(ROOT, '..', '.env')).get('SARVAM_API_KEY')
 if not key:
     sys.exit('SARVAM_API_KEY not found (env or festivekit/.env)')
